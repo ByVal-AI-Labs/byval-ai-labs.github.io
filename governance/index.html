@@ -1,0 +1,2079 @@
+<!doctype html>
+<!--
+  Source template for the Governance & Standards page. Edit this file (layout, styles, behaviour),
+  then run `make governance`. build_governance.py injects the controls and standards and writes index.html.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Governance &amp; Standards</title>
+<style>
+  :root {
+    --bg: #f6f6f3; --surface: #ffffff; --surface-2: #efefea; --text: #1c1c1a; --muted: #5d5d57;
+    --border: #dfdfd8; --accent: #2b55c9; --accent-soft: #e7edfb; --code-bg: #f1f1ec;
+    --auto: #1d7149; --auto-soft: #e3f2e9;
+    --checked: #2b55c9; --checked-soft: #e7edfb;
+    --review: #8a4b0f; --review-soft: #f8ecdf;
+    --process: #55554f; --process-soft: #ececE6;
+    --must: #a1261b; --must-soft: #fbe9e6; --should: #55554f; --should-soft: #ececE6;
+    --shadow: 0 1px 2px rgba(20, 20, 15, .06), 0 4px 16px rgba(20, 20, 15, .05);
+    --radius: 12px;
+    --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121315; --surface: #1a1b1e; --surface-2: #232428; --text: #ebebe7; --muted: #a2a29c;
+      --border: #303136; --accent: #7d9bff; --accent-soft: #1e2744; --code-bg: #24252a;
+      --auto: #63c995; --auto-soft: #16301f; --checked: #7d9bff; --checked-soft: #1e2744;
+      --review: #f0a964; --review-soft: #35240f; --process: #b5b5ae; --process-soft: #2a2b2f;
+      --must: #ff8f80; --must-soft: #3a1a16; --should: #b5b5ae; --should-soft: #2a2b2f;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 16px rgba(0, 0, 0, .25);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121315; --surface: #1a1b1e; --surface-2: #232428; --text: #ebebe7; --muted: #a2a29c;
+    --border: #303136; --accent: #7d9bff; --accent-soft: #1e2744; --code-bg: #24252a;
+    --auto: #63c995; --auto-soft: #16301f; --checked: #7d9bff; --checked-soft: #1e2744;
+    --review: #f0a964; --review-soft: #35240f; --process: #b5b5ae; --process-soft: #2a2b2f;
+    --must: #ff8f80; --must-soft: #3a1a16; --should: #b5b5ae; --should-soft: #2a2b2f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 16px rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 var(--font); }
+  a { color: var(--accent); }
+  code { font: .88em var(--mono); background: var(--code-bg); padding: .1em .35em; border-radius: 5px; }
+  pre { background: var(--code-bg); padding: 10px 12px; border-radius: 8px; overflow-x: auto; }
+  pre code { background: none; padding: 0; font-size: 12.5px; }
+  .ref { border-bottom: 1px dotted var(--muted); cursor: help; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+
+  header.hero { padding: 40px 0 24px; }
+  .hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .portal-link { display: inline-block; margin-bottom: 14px; font-size: 13px; font-weight: 500; text-decoration: none; }
+  .portal-link:hover { text-decoration: underline; }
+  .eyebrow { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  h1 { margin: 6px 0 12px; font-size: clamp(26px, 4vw, 36px); line-height: 1.2; letter-spacing: -.01em; }
+  .intro { max-width: 760px; color: var(--muted); }
+  .intro p { margin: 0 0 10px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .stat { font-size: 13px; padding: 4px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); }
+  .stat b { font-weight: 700; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+  nav.tabs { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+  nav.tabs .wrap { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  nav.tabs a { flex: none; padding: 14px 12px; color: var(--muted); text-decoration: none; font-weight: 500; border-bottom: 2px solid transparent; }
+  nav.tabs a:hover { color: var(--text); border-bottom-color: var(--accent); }
+  section { padding: 40px 0 8px; }
+  h2 { font-size: 24px; margin: 0 0 6px; letter-spacing: -.01em; }
+  .lede { color: var(--muted); margin: 0 0 20px; max-width: 760px; }
+
+  /* enforcement levels */
+  .badge { display: inline-block; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
+  .lv-automated { background: var(--auto-soft); color: var(--auto); }
+  .lv-checked { background: var(--checked-soft); color: var(--checked); }
+  .lv-review { background: var(--review-soft); color: var(--review); }
+  .lv-process { background: var(--process-soft); color: var(--process); }
+  .legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .legend div { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--muted); }
+  .legend .badge { margin-bottom: 4px; }
+
+  /* controls */
+  .controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; align-items: start; }
+  .control { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; min-width: 0; }
+  .control h3 { margin: 0 0 8px; font-size: 17px; }
+  .control .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .control .guarantee { margin: 0 0 12px; font-weight: 500; }
+  .control h4 { margin: 10px 0 2px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .control p { margin: 0; font-size: 14px; }
+  .rule-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .rule-link { border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 7px;
+    padding: 2px 8px; font: 12.5px var(--mono); cursor: pointer; }
+  .rule-link:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* standards browser */
+  details.precedence { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 16px; }
+  details.precedence summary { cursor: pointer; padding: 12px 16px; font-weight: 600; }
+  details.precedence > div { padding: 0 16px 8px; font-size: 14px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .chip { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px;
+    padding: 5px 12px; font: inherit; font-size: 14px; cursor: pointer; }
+  .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .chip .count { opacity: .6; margin-left: 4px; }
+  .search { flex: 1 1 220px; min-width: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    border-radius: 999px; padding: 7px 14px; font: inherit; font-size: 14px; }
+  .search:focus, .chip:focus-visible, .rule-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .result-count { font-size: 13px; color: var(--muted); margin: 8px 0 12px; }
+  .standard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 14px; overflow: hidden; }
+  .standard-head { padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+  .standard-head h3 { margin: 0; font-size: 17px; }
+  .standard-head p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+  .category { padding: 4px 18px 8px; }
+  .category h4 { margin: 12px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .rule { display: grid; grid-template-columns: 92px 70px 1fr; gap: 10px; align-items: start; padding: 8px 0;
+    border-top: 1px solid var(--border); font-size: 14px; transition: background .4s; }
+  .category h4 + .rule { border-top: none; }
+  .rule.flash { background: var(--accent-soft); }
+  .rule-id { font: 600 13px var(--mono); padding-top: 1px; }
+  .rule-body { min-width: 0; overflow-wrap: anywhere; }
+  .rule-body p { margin: 0 0 6px; }
+  .rule-body p:last-child { margin-bottom: 0; }
+  .rule-body ul, .rule-body ol { margin: 4px 0; padding-left: 20px; }
+  .lvl-MUST { background: var(--must-soft); color: var(--must); }
+  .lvl-SHOULD, .lvl-MAY { background: var(--should-soft); color: var(--should); }
+  .empty { color: var(--muted); padding: 24px; text-align: center; border: 1px dashed var(--border); border-radius: var(--radius); }
+  footer { margin-top: 48px; padding: 24px 0 40px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
+
+  @media (max-width: 560px) {
+    .controls { grid-template-columns: 1fr; }
+    .rule { grid-template-columns: auto 1fr; }
+    .rule-body { grid-column: 1 / -1; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <div>
+        <a class="portal-link" id="portal-link" href="../" hidden>← ADLC Portal</a>
+        <p class="eyebrow">ADLC · Governance</p>
+        <h1>Governance &amp; Standards</h1>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle colour theme">◐ Theme</button>
+    </div>
+    <div class="intro" id="intro"></div>
+    <div class="stats" id="stats"></div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="wrap">
+    <a href="#controls">Controls</a>
+    <a href="#standards">Standards</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section id="controls" aria-labelledby="controls-title">
+    <h2 id="controls-title">Controls</h2>
+    <p class="lede">What stakeholders can rely on, and how strongly each guarantee is enforced.</p>
+    <div class="legend">
+      <div><span class="badge lv-automated">Automated</span><br>CI blocks it. A pipeline check fails the build or the phase gate.</div>
+      <div><span class="badge lv-checked">Gate-checked</span><br>A gate verifies the evidence exists (an approval, a record, a decision). A person provides it.</div>
+      <div><span class="badge lv-review">Review</span><br>Reviewers check it against a written checklist. Findings block the merge by severity.</div>
+      <div><span class="badge lv-process">Process</span><br>A playbook rule every agent and person follows. It's not mechanically enforced.</div>
+    </div>
+    <div class="controls" id="control-grid"></div>
+  </section>
+
+  <section id="standards" aria-labelledby="standards-title">
+    <h2 id="standards-title">Coding standards</h2>
+    <p class="lede">Every rule has an id that reviews cite. <b>MUST</b> rules are mandatory, and an exception needs a recorded
+      architecture decision. <b>SHOULD</b> rules are expected, and skipping one needs a stated reason.</p>
+    <details class="precedence"><summary>When rules conflict: precedence</summary><div id="precedence"></div></details>
+    <div class="toolbar" id="standard-filters" aria-label="Filter by standard"></div>
+    <div class="toolbar">
+      <div id="level-filters" style="display:flex;gap:8px;flex-wrap:wrap" aria-label="Filter by level"></div>
+      <input class="search" id="search" type="search" placeholder="Search rules, e.g. secrets, async, PY-40…" aria-label="Search rules">
+    </div>
+    <p class="result-count" id="result-count" aria-live="polite"></p>
+    <div id="rule-list"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    Generated by <code>make governance</code> from <code>adlc-governance/controls.md</code> and <code>docs/standards/</code>.
+    Edit those sources, not this page.
+  </div>
+</footer>
+
+<script type="application/json" id="governance-data">{
+ "introHtml": "<p>Every project built with the ADLC runs under the same controls. AI agents draft the work. People approve it, independent reviewers check it, and automated gates block anything that doesn&#x27;t trace back to an agreed requirement. Each control below says what it guarantees and how strongly it is enforced.<\/p>",
+ "controls": [
+  {
+   "title": "Human approval at every phase",
+   "levels": [
+    "checked",
+    "process"
+   ],
+   "guaranteeHtml": "AI drafts every artifact, and a person approves each phase before work moves on.",
+   "howHtml": "Agents may only mark a phase as passed after explicit approval from a person. The spec gate fails until the approval checklist in the specification is ticked, and the review gate fails until a review record says <code>Verdict: APPROVED<\/code>.",
+   "evidenceHtml": "The phase tracker records who approved each gate and when. Approval checklists and review records are kept in the repository.",
+   "rules": []
+  },
+  {
+   "title": "Independent review",
+   "levels": [
+    "checked",
+    "review"
+   ],
+   "guaranteeHtml": "The context that wrote a piece of work never approves it.",
+   "howHtml": "Specifications, tests and code are reviewed by dedicated reviewer roles (spec critic, test auditor, code reviewer), each running in a separate AI context or done by a person. Findings carry a severity, and Critical and High findings block the merge.",
+   "evidenceHtml": "A dated review record per slice of work, with findings, severities and a verdict.",
+   "rules": []
+  },
+  {
+   "title": "Tests before code",
+   "levels": [
+    "automated",
+    "process"
+   ],
+   "guaranteeHtml": "Every acceptance criterion has a test before implementation starts, and every test verifies a real requirement.",
+   "howHtml": "The TDD gate fails if any acceptance criterion has no test, or if a test references no requirement or a withdrawn one. Seeing each test fail before writing the code (&quot;red first&quot;) is a playbook rule. The gate reminds reviewers to confirm it, but it cannot prove the order.",
+   "evidenceHtml": "The test plan and a traceability matrix listing the tests for each acceptance criterion.",
+   "rules": [
+    "GEN-60"
+   ]
+  },
+  {
+   "title": "End-to-end traceability",
+   "levels": [
+    "automated"
+   ],
+   "guaranteeHtml": "Every requirement can be followed to its design, tests and results, and every test and component can be followed back to a requirement.",
+   "howHtml": "Requirement ids (<code>FR-001<\/code>, <code>AC-001<\/code>) run through the specification, architecture, test names, test results, commits and pull requests. A generated matrix checks both directions. The spec, design, TDD and build gates fail on any gap, and CI runs them on every pull request.",
+   "evidenceHtml": "The generated traceability matrix, with requirement, component, test, file and line, and pass or fail.",
+   "rules": [
+    "GEN-71"
+   ]
+  },
+  {
+   "title": "Explicit, citable coding standards",
+   "levels": [
+    "automated",
+    "review"
+   ],
+   "guaranteeHtml": "Code follows written rules with ids, and any exception to a mandatory rule is a recorded decision.",
+   "howHtml": "Formatters, linters, analyzers and type checkers run in CI, and warnings fail the build. Rules that tooling cannot check are reviewed against a checklist, and findings cite the rule id. Breaking a MUST rule requires an accepted architecture decision record.",
+   "evidenceHtml": "Lint results in CI, review findings citing rule ids, and the standards browser below.",
+   "rules": [
+    "GEN-30",
+    "GEN-31"
+   ]
+  },
+  {
+   "title": "Security & privacy by default",
+   "levels": [
+    "review"
+   ],
+   "guaranteeHtml": "No secrets or personal data in code, logs or tests, injection-safe data access, and vetted dependencies.",
+   "howHtml": "The standards make these mandatory rules. Every review works through the checklist&#x27;s security section (secrets, authentication and authorisation, injection including prompt injection, personal data, dependencies) and runs a dedicated security review. The template does not scan automatically; projects add secret scanning and dependency audits to their CI.",
+   "evidenceHtml": "The security section of each review record.",
+   "rules": [
+    "GEN-41",
+    "GEN-50",
+    "GEN-51",
+    "GEN-52"
+   ]
+  },
+  {
+   "title": "Decisions on record",
+   "levels": [
+    "checked",
+    "process"
+   ],
+   "guaranteeHtml": "Significant design choices, and any exception to a standard, are written down with their options and trade-offs.",
+   "howHtml": "Non-obvious choices become architecture decision records (ADRs). The design gate fails until the project has an accepted ADR, starting with the technology stack. If implementation must diverge from the agreed architecture, work stops until a new ADR is approved.",
+   "evidenceHtml": "The numbered ADR log, with status, context, options considered and consequences.",
+   "rules": []
+  },
+  {
+   "title": "Requirements are never invented",
+   "levels": [
+    "checked",
+    "process"
+   ],
+   "guaranteeHtml": "When the specification is silent or ambiguous, the AI asks instead of guessing in code.",
+   "howHtml": "Agents record an open question in the specification and ask a person. The spec gate fails while any question is still open.",
+   "evidenceHtml": "Resolved questions stay in the specification with their answers.",
+   "rules": []
+  },
+  {
+   "title": "No AI-vendor lock-in",
+   "levels": [
+    "automated"
+   ],
+   "guaranteeHtml": "The same process, rules and reviewers run in Claude Code, GitHub Copilot, Cursor and Gemini CLI, or by hand.",
+   "howHtml": "Playbooks and reviewer roles have one tool-neutral source. Each tool&#x27;s own files are generated from it, and CI fails if they drift.",
+   "evidenceHtml": "A single source folder for the playbooks, and the generated tool files checked in CI.",
+   "rules": []
+  },
+  {
+   "title": "Continuous improvement",
+   "levels": [
+    "checked",
+    "process"
+   ],
+   "guaranteeHtml": "Every signal, including review leftovers, incidents and user feedback, is routed back to the specification, design, tests or the process, with an owner.",
+   "howHtml": "The feedback gate fails if any item lacks a route or an owner. Lasting lessons become new rules for the AI agents, so the same mistake is not repeated.",
+   "evidenceHtml": "The feedback log with related requirement ids, routes and owners, and the &quot;Lessons learned&quot; rules.",
+   "rules": []
+  }
+ ],
+ "standards": [
+  {
+   "key": "GENERAL",
+   "label": "General",
+   "description": "General coding standards for all languages — naming, functions, errors, comments, dependencies, git, security basics.",
+   "appliesTo": "**",
+   "introHtml": "<p>Language-agnostic rules. Stack standards refine them.<\/p>",
+   "rules": [
+    {
+     "id": "GEN-01",
+     "level": "MUST",
+     "category": "Design & readability",
+     "html": "<p>Use the domain language from <code>CONTEXT.md<\/code> for names of types, functions, variables, endpoints and tables. No synonyms for glossary terms.<\/p>",
+     "text": "Use the domain language from `CONTEXT.md` for names of types, functions, variables, endpoints and tables. No synonyms for glossary terms."
+    },
+    {
+     "id": "GEN-02",
+     "level": "MUST",
+     "category": "Design & readability",
+     "html": "<p>Names reveal intent: <code>invoiceTotal<\/code>, not <code>tmp<\/code>, <code>data2<\/code>, <code>mgr<\/code>. Booleans read as predicates (<code>isPaid<\/code>, <code>hasErrors<\/code>). Abbreviations only if universal (<code>id<\/code>, <code>url<\/code>, <code>http<\/code>).<\/p>",
+     "text": "Names reveal intent: `invoiceTotal`, not `tmp`, `data2`, `mgr`. Booleans read as predicates (`isPaid`, `hasErrors`). Abbreviations only if universal (`id`, `url`, `http`)."
+    },
+    {
+     "id": "GEN-03",
+     "level": "SHOULD",
+     "category": "Design & readability",
+     "html": "<p>Functions do one thing at one level of abstraction; prefer &lt; 40 lines and ≤ 4 parameters (use a parameter object beyond that).<\/p>",
+     "text": "Functions do one thing at one level of abstraction; prefer < 40 lines and ≤ 4 parameters (use a parameter object beyond that)."
+    },
+    {
+     "id": "GEN-04",
+     "level": "SHOULD",
+     "category": "Design & readability",
+     "html": "<p>Prefer <strong>deep modules<\/strong>: a small public interface hiding real behaviour. Don&#x27;t create layers, interfaces or abstractions that have a single trivial implementation and no test seam reason.<\/p>",
+     "text": "Prefer **deep modules**: a small public interface hiding real behaviour. Don't create layers, interfaces or abstractions that have a single trivial implementation and no test seam reason."
+    },
+    {
+     "id": "GEN-05",
+     "level": "MUST",
+     "category": "Design & readability",
+     "html": "<p>No dead code, commented-out code or unused parameters/imports in <code>main<\/code>.<\/p>",
+     "text": "No dead code, commented-out code or unused parameters/imports in `main`."
+    },
+    {
+     "id": "GEN-06",
+     "level": "SHOULD",
+     "category": "Design & readability",
+     "html": "<p>Prefer immutability and pure functions; isolate side effects (I/O, time, randomness) at the edges so core logic is testable.<\/p>",
+     "text": "Prefer immutability and pure functions; isolate side effects (I/O, time, randomness) at the edges so core logic is testable."
+    },
+    {
+     "id": "GEN-07",
+     "level": "MUST",
+     "category": "Design & readability",
+     "html": "<p>No magic numbers/strings for business rules — named constants or configuration.<\/p>",
+     "text": "No magic numbers/strings for business rules — named constants or configuration."
+    },
+    {
+     "id": "GEN-08",
+     "level": "SHOULD",
+     "category": "Design & readability",
+     "html": "<p>Early returns over deep nesting (max ~3 levels).<\/p>",
+     "text": "Early returns over deep nesting (max ~3 levels)."
+    },
+    {
+     "id": "GEN-10",
+     "level": "MUST",
+     "category": "Errors",
+     "html": "<p>Never swallow errors. Either handle meaningfully, or propagate with context. Empty <code>catch<\/code>/<code>except<\/code> blocks are forbidden.<\/p>",
+     "text": "Never swallow errors. Either handle meaningfully, or propagate with context. Empty `catch`/`except` blocks are forbidden."
+    },
+    {
+     "id": "GEN-11",
+     "level": "MUST",
+     "category": "Errors",
+     "html": "<p>Validate input at trust boundaries (API, UI forms, files, messages, env); trust internal calls.<\/p>",
+     "text": "Validate input at trust boundaries (API, UI forms, files, messages, env); trust internal calls."
+    },
+    {
+     "id": "GEN-12",
+     "level": "SHOULD",
+     "category": "Errors",
+     "html": "<p>Distinguish expected business failures (return a result / typed error) from unexpected faults (exceptions). Error messages are actionable and contain no secrets or PII.<\/p>",
+     "text": "Distinguish expected business failures (return a result / typed error) from unexpected faults (exceptions). Error messages are actionable and contain no secrets or PII."
+    },
+    {
+     "id": "GEN-20",
+     "level": "SHOULD",
+     "category": "Comments & documentation",
+     "html": "<p>Comments explain <em>why<\/em> (constraints, trade-offs, links to ADRs or requirement ids), not <em>what<\/em> the code does.<\/p>",
+     "text": "Comments explain *why* (constraints, trade-offs, links to ADRs or requirement ids), not *what* the code does."
+    },
+    {
+     "id": "GEN-21",
+     "level": "MUST",
+     "category": "Comments & documentation",
+     "html": "<p>Public APIs (exported modules, HTTP endpoints, library functions) have doc comments / OpenAPI descriptions.<\/p>",
+     "text": "Public APIs (exported modules, HTTP endpoints, library functions) have doc comments / OpenAPI descriptions."
+    },
+    {
+     "id": "GEN-22",
+     "level": "SHOULD",
+     "category": "Comments & documentation",
+     "html": "<p><code>TODO<\/code> comments reference a feedback item or ticket: <code>TODO(FB-012): …<\/code>.<\/p>",
+     "text": "`TODO` comments reference a feedback item or ticket: `TODO(FB-012): …`."
+    },
+    {
+     "id": "GEN-30",
+     "level": "MUST",
+     "category": "Formatting & tooling",
+     "html": "<p>Code is auto-formatted by the stack&#x27;s formatter; CI fails on unformatted code. No style debates in review.<\/p>",
+     "text": "Code is auto-formatted by the stack's formatter; CI fails on unformatted code. No style debates in review."
+    },
+    {
+     "id": "GEN-31",
+     "level": "MUST",
+     "category": "Formatting & tooling",
+     "html": "<p>Linter/analyzer warnings are errors in CI. Suppressions are local, specific and carry a reason.<\/p>",
+     "text": "Linter/analyzer warnings are errors in CI. Suppressions are local, specific and carry a reason."
+    },
+    {
+     "id": "GEN-32",
+     "level": "MUST",
+     "category": "Formatting & tooling",
+     "html": "<p><code>.editorconfig<\/code> at the root defines encoding (UTF-8), line endings (LF) and indentation.<\/p>",
+     "text": "`.editorconfig` at the root defines encoding (UTF-8), line endings (LF) and indentation."
+    },
+    {
+     "id": "GEN-40",
+     "level": "MUST",
+     "category": "Dependencies",
+     "html": "<p>Pin versions via lock files (<code>packages.lock.json<\/code>/central packages, <code>package-lock.json<\/code>, <code>uv.lock<\/code>), and commit them.<\/p>",
+     "text": "Pin versions via lock files (`packages.lock.json`/central packages, `package-lock.json`, `uv.lock`), and commit them."
+    },
+    {
+     "id": "GEN-41",
+     "level": "MUST",
+     "category": "Dependencies",
+     "html": "<p>Before adding a dependency check: maintenance activity, licence compatibility (and commercial licence changes), security advisories, size. Record notable ones in an ADR.<\/p>",
+     "text": "Before adding a dependency check: maintenance activity, licence compatibility (and commercial licence changes), security advisories, size. Record notable ones in an ADR."
+    },
+    {
+     "id": "GEN-42",
+     "level": "SHOULD",
+     "category": "Dependencies",
+     "html": "<p>Automate updates (Dependabot/Renovate) and vulnerability scanning in CI.<\/p>",
+     "text": "Automate updates (Dependabot/Renovate) and vulnerability scanning in CI."
+    },
+    {
+     "id": "GEN-50",
+     "level": "MUST",
+     "category": "Security basics",
+     "html": "<p>No secrets in code, config files, tests, logs or git history. Use environment variables / a secret store; <code>.env<\/code> files are git-ignored with an <code>.env.example<\/code>.<\/p>",
+     "text": "No secrets in code, config files, tests, logs or git history. Use environment variables / a secret store; `.env` files are git-ignored with an `.env.example`."
+    },
+    {
+     "id": "GEN-51",
+     "level": "MUST",
+     "category": "Security basics",
+     "html": "<p>No PII or credentials in logs, exceptions, analytics or test fixtures.<\/p>",
+     "text": "No PII or credentials in logs, exceptions, analytics or test fixtures."
+    },
+    {
+     "id": "GEN-52",
+     "level": "MUST",
+     "category": "Security basics",
+     "html": "<p>Use parameterised queries and safe APIs; never build SQL, shell commands, HTML or prompts by string concatenation with untrusted input.<\/p>",
+     "text": "Use parameterised queries and safe APIs; never build SQL, shell commands, HTML or prompts by string concatenation with untrusted input."
+    },
+    {
+     "id": "GEN-53",
+     "level": "SHOULD",
+     "category": "Security basics",
+     "html": "<p>Least privilege for service accounts, tokens and database users.<\/p>",
+     "text": "Least privilege for service accounts, tokens and database users."
+    },
+    {
+     "id": "GEN-60",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>Tests follow <code>docs/03-tests/TEST-PLAN.md<\/code>: AC ids in test names, behaviour over implementation, mocks only at boundaries, deterministic.<\/p>",
+     "text": "Tests follow `docs/03-tests/TEST-PLAN.md`: AC ids in test names, behaviour over implementation, mocks only at boundaries, deterministic."
+    },
+    {
+     "id": "GEN-61",
+     "level": "SHOULD",
+     "category": "Testing",
+     "html": "<p>Arrange–Act–Assert structure; one behaviour per test; test names read as specifications.<\/p>",
+     "text": "Arrange–Act–Assert structure; one behaviour per test; test names read as specifications."
+    },
+    {
+     "id": "GEN-70",
+     "level": "MUST",
+     "category": "Git",
+     "html": "<p>Branches: <code>slice/S&lt;n&gt;-&lt;name&gt;<\/code>, <code>fix/FB-&lt;n&gt;-&lt;name&gt;<\/code>, <code>chore/&lt;name&gt;<\/code>.<\/p>",
+     "text": "Branches: `slice/S<n>-<name>`, `fix/FB-<n>-<name>`, `chore/<name>`."
+    },
+    {
+     "id": "GEN-71",
+     "level": "MUST",
+     "category": "Git",
+     "html": "<p>Conventional commits referencing ids: <code>feat(S1): AC-003 export CSV<\/code>, <code>test(S1): failing tests for AC-001..AC-004<\/code>, <code>fix(FB-007): …<\/code>.<\/p>",
+     "text": "Conventional commits referencing ids: `feat(S1): AC-003 export CSV`, `test(S1): failing tests for AC-001..AC-004`, `fix(FB-007): …`."
+    },
+    {
+     "id": "GEN-72",
+     "level": "SHOULD",
+     "category": "Git",
+     "html": "<p>Small PRs (&lt; ~400 changed lines excluding generated files); one slice per PR.<\/p>",
+     "text": "Small PRs (< ~400 changed lines excluding generated files); one slice per PR."
+    }
+   ]
+  },
+  {
+   "key": "FRONTEND",
+   "label": "Frontend",
+   "description": "General frontend guidelines for any web UI — architecture, state, accessibility, performance, security, UX states, i18n and testing.",
+   "appliesTo": "**/*.ts, **/*.tsx, **/*.js, **/*.jsx, **/*.css, **/*.scss, **/*.html, **/*.razor, **/*.razor.cs, **/*.razor.css, **/*.cshtml",
+   "introHtml": "<p>Technology-neutral rules for any web UI. <span class=\"ref\" title=\"REACT.md\">REACT.md<\/span> adds React specifics; <span class=\"ref\" title=\"BLAZOR.md\">BLAZOR.md<\/span> adds Blazor specifics.<\/p>",
+   "rules": [
+    {
+     "id": "FE-01",
+     "level": "MUST",
+     "category": "Architecture",
+     "html": "<p>Organise by <strong>feature<\/strong> (<code>features/invoices/…<\/code>), not by technical type (<code>components/<\/code>, <code>hooks/<\/code>, <code>utils/<\/code> at the root for everything). Shared, generic UI goes in <code>shared/ui<\/code>.<\/p>",
+     "text": "Organise by **feature** (`features/invoices/…`), not by technical type (`components/`, `hooks/`, `utils/` at the root for everything). Shared, generic UI goes in `shared/ui`."
+    },
+    {
+     "id": "FE-02",
+     "level": "MUST",
+     "category": "Architecture",
+     "html": "<p>Keep business rules out of UI components: put them in pure functions/modules that can be unit-tested without rendering. Server-side rules stay server-side; the UI may pre-validate but the API is authoritative.<\/p>",
+     "text": "Keep business rules out of UI components: put them in pure functions/modules that can be unit-tested without rendering. Server-side rules stay server-side; the UI may pre-validate but the API is authoritative."
+    },
+    {
+     "id": "FE-03",
+     "level": "SHOULD",
+     "category": "Architecture",
+     "html": "<p>One API client layer (typed, generated from OpenAPI where possible). No ad-hoc <code>fetch<\/code> calls scattered through components.<\/p>",
+     "text": "One API client layer (typed, generated from OpenAPI where possible). No ad-hoc `fetch` calls scattered through components."
+    },
+    {
+     "id": "FE-04",
+     "level": "SHOULD",
+     "category": "Architecture",
+     "html": "<p>Use a design system / component library and design tokens (colours, spacing, typography) instead of hard-coded values.<\/p>",
+     "text": "Use a design system / component library and design tokens (colours, spacing, typography) instead of hard-coded values."
+    },
+    {
+     "id": "FE-10",
+     "level": "MUST",
+     "category": "State",
+     "html": "<p>Classify state and use the right home for it: server state → data-fetching cache; URL state (filters, pagination, selected tab) → the URL; form state → a form library; local UI state → the component; only truly global client state → a store.<\/p>",
+     "text": "Classify state and use the right home for it: server state → data-fetching cache; URL state (filters, pagination, selected tab) → the URL; form state → a form library; local UI state → the component; only truly global client state → a store."
+    },
+    {
+     "id": "FE-11",
+     "level": "MUST",
+     "category": "State",
+     "html": "<p>Don&#x27;t duplicate server data in a client store; don&#x27;t store derived values — compute them.<\/p>",
+     "text": "Don't duplicate server data in a client store; don't store derived values — compute them."
+    },
+    {
+     "id": "FE-20",
+     "level": "MUST",
+     "category": "UX states",
+     "html": "<p>Every data-driven view handles <strong>loading, empty, error and success<\/strong> states; errors offer a recovery action (retry, back, contact).<\/p>",
+     "text": "Every data-driven view handles **loading, empty, error and success** states; errors offer a recovery action (retry, back, contact)."
+    },
+    {
+     "id": "FE-21",
+     "level": "MUST",
+     "category": "UX states",
+     "html": "<p>Forms: inline validation messages tied to fields, preserve user input on error, disable double submission, confirm destructive actions.<\/p>",
+     "text": "Forms: inline validation messages tied to fields, preserve user input on error, disable double submission, confirm destructive actions."
+    },
+    {
+     "id": "FE-22",
+     "level": "SHOULD",
+     "category": "UX states",
+     "html": "<p>Optimistic updates only where rollback is handled.<\/p>",
+     "text": "Optimistic updates only where rollback is handled."
+    },
+    {
+     "id": "FE-30",
+     "level": "MUST",
+     "category": "Accessibility (WCAG 2.2 AA)",
+     "html": "<p>Semantic HTML first (<code>button<\/code>, <code>a<\/code>, <code>nav<\/code>, <code>main<\/code>, <code>label<\/code>, <code>table<\/code>); ARIA only to fill gaps.<\/p>",
+     "text": "Semantic HTML first (`button`, `a`, `nav`, `main`, `label`, `table`); ARIA only to fill gaps."
+    },
+    {
+     "id": "FE-31",
+     "level": "MUST",
+     "category": "Accessibility (WCAG 2.2 AA)",
+     "html": "<p>Fully keyboard operable, visible focus, logical focus order; focus is managed on route change and in dialogs.<\/p>",
+     "text": "Fully keyboard operable, visible focus, logical focus order; focus is managed on route change and in dialogs."
+    },
+    {
+     "id": "FE-32",
+     "level": "MUST",
+     "category": "Accessibility (WCAG 2.2 AA)",
+     "html": "<p>Every form control has a label; images have meaningful <code>alt<\/code> (or <code>alt=&quot;&quot;<\/code> if decorative); colour is never the only signal; contrast ≥ 4.5:1 for text.<\/p>",
+     "text": "Every form control has a label; images have meaningful `alt` (or `alt=\"\"` if decorative); colour is never the only signal; contrast ≥ 4.5:1 for text."
+    },
+    {
+     "id": "FE-33",
+     "level": "SHOULD",
+     "category": "Accessibility (WCAG 2.2 AA)",
+     "html": "<p>Automated a11y checks in tests (axe) and lint (e.g. jsx-a11y for React; axe in Playwright for Blazor).<\/p>",
+     "text": "Automated a11y checks in tests (axe) and lint (e.g. jsx-a11y for React; axe in Playwright for Blazor)."
+    },
+    {
+     "id": "FE-40",
+     "level": "SHOULD",
+     "category": "Performance",
+     "html": "<p>Budgets per NFR: e.g. LCP &lt; 2.5 s, INP &lt; 200 ms, CLS &lt; 0.1 on the reference device; initial JS &lt; ~200 KB gzipped.<\/p>",
+     "text": "Budgets per NFR: e.g. LCP < 2.5 s, INP < 200 ms, CLS < 0.1 on the reference device; initial JS < ~200 KB gzipped."
+    },
+    {
+     "id": "FE-41",
+     "level": "SHOULD",
+     "category": "Performance",
+     "html": "<p>Code-split by route; lazy-load heavy, rarely used features; optimise images (modern formats, explicit dimensions, lazy loading).<\/p>",
+     "text": "Code-split by route; lazy-load heavy, rarely used features; optimise images (modern formats, explicit dimensions, lazy loading)."
+    },
+    {
+     "id": "FE-42",
+     "level": "SHOULD",
+     "category": "Performance",
+     "html": "<p>Virtualise long lists (&gt; ~200 rows); debounce search inputs.<\/p>",
+     "text": "Virtualise long lists (> ~200 rows); debounce search inputs."
+    },
+    {
+     "id": "FE-50",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>Never inject unsanitised HTML (<code>innerHTML<\/code>, <code>dangerouslySetInnerHTML<\/code>, <code>v-html<\/code>, Blazor <code>MarkupString<\/code>) — sanitise with a vetted library if unavoidable.<\/p>",
+     "text": "Never inject unsanitised HTML (`innerHTML`, `dangerouslySetInnerHTML`, `v-html`, Blazor `MarkupString`) — sanitise with a vetted library if unavoidable."
+    },
+    {
+     "id": "FE-51",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>No secrets in frontend code or env files shipped to the browser; everything in the bundle is public.<\/p>",
+     "text": "No secrets in frontend code or env files shipped to the browser; everything in the bundle is public."
+    },
+    {
+     "id": "FE-52",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>Prefer HttpOnly, Secure, SameSite cookies for session tokens over <code>localStorage<\/code>. Apply a Content Security Policy.<\/p>",
+     "text": "Prefer HttpOnly, Secure, SameSite cookies for session tokens over `localStorage`. Apply a Content Security Policy."
+    },
+    {
+     "id": "FE-53",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>Authorisation is enforced by the backend; hiding a button is UX, not security.<\/p>",
+     "text": "Authorisation is enforced by the backend; hiding a button is UX, not security."
+    },
+    {
+     "id": "FE-60",
+     "level": "SHOULD",
+     "category": "Internationalisation",
+     "html": "<p>No user-visible strings hard-coded in components when the product is (or may be) multilingual — use an i18n library with message keys.<\/p>",
+     "text": "No user-visible strings hard-coded in components when the product is (or may be) multilingual — use an i18n library with message keys."
+    },
+    {
+     "id": "FE-61",
+     "level": "MUST",
+     "category": "Internationalisation",
+     "html": "<p>Format dates, numbers and currency with <code>Intl<\/code>/locale-aware helpers; store and transmit timestamps in UTC ISO-8601.<\/p>",
+     "text": "Format dates, numbers and currency with `Intl`/locale-aware helpers; store and transmit timestamps in UTC ISO-8601."
+    },
+    {
+     "id": "FE-70",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>Test from the user&#x27;s perspective: query by role/label/text, not CSS classes or test ids (test ids only as a last resort).<\/p>",
+     "text": "Test from the user's perspective: query by role/label/text, not CSS classes or test ids (test ids only as a last resort)."
+    },
+    {
+     "id": "FE-71",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>Acceptance criteria that involve UI flows have an end-to-end test (Playwright or equivalent) named with the AC id.<\/p>",
+     "text": "Acceptance criteria that involve UI flows have an end-to-end test (Playwright or equivalent) named with the AC id."
+    },
+    {
+     "id": "FE-72",
+     "level": "SHOULD",
+     "category": "Testing",
+     "html": "<p>Mock the network at the HTTP boundary (e.g. MSW, or an <code>HttpMessageHandler<\/code> stub in .NET), not internal modules.<\/p>",
+     "text": "Mock the network at the HTTP boundary (e.g. MSW, or an `HttpMessageHandler` stub in .NET), not internal modules."
+    },
+    {
+     "id": "FE-73",
+     "level": "SHOULD",
+     "category": "Testing",
+     "html": "<p>Visual regression tests only for stable, design-critical components.<\/p>",
+     "text": "Visual regression tests only for stable, design-critical components."
+    }
+   ]
+  },
+  {
+   "key": "BACKEND",
+   "label": "Backend",
+   "description": "General backend guidelines for any service, API or worker — API design, errors, data, resilience, security, observability, configuration and testing.",
+   "appliesTo": "**/*.cs, **/*.py, **/*.java, **/*.kt, **/*.go, **/*.sql, **/openapi*.yaml",
+   "introHtml": "<p>Technology-neutral rules for services, APIs and background workers. <span class=\"ref\" title=\"DOTNET.md\">DOTNET.md<\/span> and <span class=\"ref\" title=\"PYTHON.md\">PYTHON.md<\/span> add language specifics. They do not apply to UI components (Blazor <code>.razor<\/code>/<code>.razor.cs<\/code> follow <span class=\"ref\" title=\"FRONTEND.md\">FRONTEND.md<\/span> + <span class=\"ref\" title=\"BLAZOR.md\">BLAZOR.md<\/span>), although the API a component calls must follow them.<\/p>",
+   "rules": [
+    {
+     "id": "BE-01",
+     "level": "MUST",
+     "category": "Architecture",
+     "html": "<p>Separate <strong>domain logic<\/strong> from <strong>I/O adapters<\/strong> (HTTP, DB, queues, external APIs). Domain code has no framework or database imports and is unit-testable in isolation.<\/p>",
+     "text": "Separate **domain logic** from **I/O adapters** (HTTP, DB, queues, external APIs). Domain code has no framework or database imports and is unit-testable in isolation."
+    },
+    {
+     "id": "BE-02",
+     "level": "SHOULD",
+     "category": "Architecture",
+     "html": "<p>Organise by feature / bounded context (vertical slices), not by technical layer only. Keep the number of layers minimal — each must earn its place.<\/p>",
+     "text": "Organise by feature / bounded context (vertical slices), not by technical layer only. Keep the number of layers minimal — each must earn its place."
+    },
+    {
+     "id": "BE-03",
+     "level": "MUST",
+     "category": "Architecture",
+     "html": "<p>Dependencies point inward: adapters depend on the domain, never the reverse.<\/p>",
+     "text": "Dependencies point inward: adapters depend on the domain, never the reverse."
+    },
+    {
+     "id": "BE-04",
+     "level": "SHOULD",
+     "category": "Architecture",
+     "html": "<p>Prefer a modular monolith until an ADR justifies splitting services.<\/p>",
+     "text": "Prefer a modular monolith until an ADR justifies splitting services."
+    },
+    {
+     "id": "BE-10",
+     "level": "MUST",
+     "category": "API design (HTTP)",
+     "html": "<p>Contract first: OpenAPI (or AsyncAPI/proto) in <code>docs/02-design/api/<\/code>, kept in sync with code (generated from code or validated against it in CI).<\/p>",
+     "text": "Contract first: OpenAPI (or AsyncAPI/proto) in `docs/02-design/api/`, kept in sync with code (generated from code or validated against it in CI)."
+    },
+    {
+     "id": "BE-11",
+     "level": "MUST",
+     "category": "API design (HTTP)",
+     "html": "<p>Resource-oriented URLs, plural nouns, kebab-case paths, consistent casing of JSON fields (camelCase unless an ADR says otherwise).<\/p>",
+     "text": "Resource-oriented URLs, plural nouns, kebab-case paths, consistent casing of JSON fields (camelCase unless an ADR says otherwise)."
+    },
+    {
+     "id": "BE-12",
+     "level": "MUST",
+     "category": "API design (HTTP)",
+     "html": "<p>Correct status codes: 200/201/204, 400 validation, 401 unauthenticated, 403 forbidden, 404 not found, 409 conflict, 422 business rule violation, 429 throttled, 5xx only for server faults.<\/p>",
+     "text": "Correct status codes: 200/201/204, 400 validation, 401 unauthenticated, 403 forbidden, 404 not found, 409 conflict, 422 business rule violation, 429 throttled, 5xx only for server faults."
+    },
+    {
+     "id": "BE-13",
+     "level": "MUST",
+     "category": "API design (HTTP)",
+     "html": "<p>Errors use <strong>RFC 9457 Problem Details<\/strong> (<code>type<\/code>, <code>title<\/code>, <code>status<\/code>, <code>detail<\/code>, <code>instance<\/code>, plus <code>errors<\/code> for field validation and a stable machine-readable <code>code<\/code>).<\/p>",
+     "text": "Errors use **RFC 9457 Problem Details** (`type`, `title`, `status`, `detail`, `instance`, plus `errors` for field validation and a stable machine-readable `code`)."
+    },
+    {
+     "id": "BE-14",
+     "level": "MUST",
+     "category": "API design (HTTP)",
+     "html": "<p>Collections are paginated (cursor-based preferred) with a maximum page size.<\/p>",
+     "text": "Collections are paginated (cursor-based preferred) with a maximum page size."
+    },
+    {
+     "id": "BE-15",
+     "level": "MUST",
+     "category": "API design (HTTP)",
+     "html": "<p>Versioning strategy decided in an ADR (URL <code>/v1<\/code> or header); no breaking changes within a version.<\/p>",
+     "text": "Versioning strategy decided in an ADR (URL `/v1` or header); no breaking changes within a version."
+    },
+    {
+     "id": "BE-16",
+     "level": "SHOULD",
+     "category": "API design (HTTP)",
+     "html": "<p>Unsafe operations that may be retried (payments, orders) accept an <strong>Idempotency-Key<\/strong>.<\/p>",
+     "text": "Unsafe operations that may be retried (payments, orders) accept an **Idempotency-Key**."
+    },
+    {
+     "id": "BE-17",
+     "level": "MUST",
+     "category": "API design (HTTP)",
+     "html": "<p>Timestamps in UTC ISO-8601; money as decimal amount + ISO currency code (never floating point).<\/p>",
+     "text": "Timestamps in UTC ISO-8601; money as decimal amount + ISO currency code (never floating point)."
+    },
+    {
+     "id": "BE-20",
+     "level": "MUST",
+     "category": "Data",
+     "html": "<p>Schema changes via versioned, reviewed migrations; never edit an applied migration. Migrations are backward compatible with the previous app version (expand → migrate → contract).<\/p>",
+     "text": "Schema changes via versioned, reviewed migrations; never edit an applied migration. Migrations are backward compatible with the previous app version (expand → migrate → contract)."
+    },
+    {
+     "id": "BE-21",
+     "level": "MUST",
+     "category": "Data",
+     "html": "<p>Transactions around each business operation; no partial writes on failure.<\/p>",
+     "text": "Transactions around each business operation; no partial writes on failure."
+    },
+    {
+     "id": "BE-22",
+     "level": "SHOULD",
+     "category": "Data",
+     "html": "<p>Avoid N+1 queries; index foreign keys and frequent filters; review query plans for hot paths.<\/p>",
+     "text": "Avoid N+1 queries; index foreign keys and frequent filters; review query plans for hot paths."
+    },
+    {
+     "id": "BE-23",
+     "level": "MUST",
+     "category": "Data",
+     "html": "<p>Personal data: classify it, minimise it, encrypt sensitive fields at rest, define retention and deletion per the charter&#x27;s regulatory constraints.<\/p>",
+     "text": "Personal data: classify it, minimise it, encrypt sensitive fields at rest, define retention and deletion per the charter's regulatory constraints."
+    },
+    {
+     "id": "BE-30",
+     "level": "MUST",
+     "category": "Resilience",
+     "html": "<p>Every outbound call has a timeout. Retries only for idempotent operations, with exponential backoff + jitter and a cap. Circuit breakers on flaky dependencies.<\/p>",
+     "text": "Every outbound call has a timeout. Retries only for idempotent operations, with exponential backoff + jitter and a cap. Circuit breakers on flaky dependencies."
+    },
+    {
+     "id": "BE-31",
+     "level": "MUST",
+     "category": "Resilience",
+     "html": "<p>Message consumers are idempotent (dedupe by message id) and have a dead-letter path. Use an outbox when a DB write and a message publish must both happen.<\/p>",
+     "text": "Message consumers are idempotent (dedupe by message id) and have a dead-letter path. Use an outbox when a DB write and a message publish must both happen."
+    },
+    {
+     "id": "BE-32",
+     "level": "SHOULD",
+     "category": "Resilience",
+     "html": "<p>Graceful shutdown: stop accepting work, finish in-flight requests, flush logs.<\/p>",
+     "text": "Graceful shutdown: stop accepting work, finish in-flight requests, flush logs."
+    },
+    {
+     "id": "BE-33",
+     "level": "MUST",
+     "category": "Resilience",
+     "html": "<p>Health endpoints: liveness (process up) and readiness (dependencies reachable).<\/p>",
+     "text": "Health endpoints: liveness (process up) and readiness (dependencies reachable)."
+    },
+    {
+     "id": "BE-40",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>Authenticate every endpoint by default; explicitly mark the public ones. Authorise per resource (check ownership/tenant), not just per role — prevent IDOR.<\/p>",
+     "text": "Authenticate every endpoint by default; explicitly mark the public ones. Authorise per resource (check ownership/tenant), not just per role — prevent IDOR."
+    },
+    {
+     "id": "BE-41",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>Validate and bound all input (size, type, range, allowed values); reject unknown fields where practical.<\/p>",
+     "text": "Validate and bound all input (size, type, range, allowed values); reject unknown fields where practical."
+    },
+    {
+     "id": "BE-42",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>Secrets from a vault/environment; rotateable; never logged.<\/p>",
+     "text": "Secrets from a vault/environment; rotateable; never logged."
+    },
+    {
+     "id": "BE-43",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>Follow OWASP ASVS / API Security Top 10 for the relevant level; rate-limit public and authentication endpoints.<\/p>",
+     "text": "Follow OWASP ASVS / API Security Top 10 for the relevant level; rate-limit public and authentication endpoints."
+    },
+    {
+     "id": "BE-44",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>When calling an LLM: treat model output as untrusted input; never pass secrets in prompts; constrain tool permissions.<\/p>",
+     "text": "When calling an LLM: treat model output as untrusted input; never pass secrets in prompts; constrain tool permissions."
+    },
+    {
+     "id": "BE-50",
+     "level": "MUST",
+     "category": "Observability",
+     "html": "<p>Structured (JSON) logs with timestamp, level, message, correlation/trace id; no PII or secrets. Log levels used consistently (ERROR = needs action).<\/p>",
+     "text": "Structured (JSON) logs with timestamp, level, message, correlation/trace id; no PII or secrets. Log levels used consistently (ERROR = needs action)."
+    },
+    {
+     "id": "BE-51",
+     "level": "SHOULD",
+     "category": "Observability",
+     "html": "<p>OpenTelemetry traces and metrics (RED: rate, errors, duration) for every endpoint and external call.<\/p>",
+     "text": "OpenTelemetry traces and metrics (RED: rate, errors, duration) for every endpoint and external call."
+    },
+    {
+     "id": "BE-52",
+     "level": "SHOULD",
+     "category": "Observability",
+     "html": "<p>Business events logged/metricised where they back a success metric in the charter.<\/p>",
+     "text": "Business events logged/metricised where they back a success metric in the charter."
+    },
+    {
+     "id": "BE-60",
+     "level": "MUST",
+     "category": "Configuration",
+     "html": "<p>Twelve-factor config: environment-specific values from environment/config service, validated at startup (fail fast on missing config).<\/p>",
+     "text": "Twelve-factor config: environment-specific values from environment/config service, validated at startup (fail fast on missing config)."
+    },
+    {
+     "id": "BE-61",
+     "level": "SHOULD",
+     "category": "Configuration",
+     "html": "<p>Feature flags for risky changes, with an owner and removal date.<\/p>",
+     "text": "Feature flags for risky changes, with an owner and removal date."
+    },
+    {
+     "id": "BE-70",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>Domain logic: fast unit tests. Adapters: integration tests against real dependencies in containers (Testcontainers or equivalent) — don&#x27;t mock the database.<\/p>",
+     "text": "Domain logic: fast unit tests. Adapters: integration tests against real dependencies in containers (Testcontainers or equivalent) — don't mock the database."
+    },
+    {
+     "id": "BE-71",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>Each API acceptance criterion has a black-box test over HTTP named with its AC id.<\/p>",
+     "text": "Each API acceptance criterion has a black-box test over HTTP named with its AC id."
+    },
+    {
+     "id": "BE-72",
+     "level": "SHOULD",
+     "category": "Testing",
+     "html": "<p>Contract tests for APIs consumed by other teams; NFR tests (load, security scan) for NFRs with numeric targets.<\/p>",
+     "text": "Contract tests for APIs consumed by other teams; NFR tests (load, security scan) for NFRs with numeric targets."
+    }
+   ]
+  },
+  {
+   "key": "DOTNET",
+   "label": ".NET",
+   "description": ".NET / C# coding standards — language rules, project structure, ASP.NET Core, EF Core, async, logging, tooling and testing with AC traceability.",
+   "appliesTo": "**/*.cs, **/*.csproj, **/*.props, **/*.targets, **/*.sln, **/*.slnx, **/*.razor, **/*.cshtml",
+   "introHtml": "<p>Baseline: <strong>current .NET LTS<\/strong> (pinned in <code>global.json<\/code>), latest stable C#. Builds on <span class=\"ref\" title=\"GENERAL.md\">GENERAL.md<\/span> and <span class=\"ref\" title=\"BACKEND.md\">BACKEND.md<\/span> (server-side code); Blazor UI code also follows <span class=\"ref\" title=\"FRONTEND.md\">FRONTEND.md<\/span> and <span class=\"ref\" title=\"BLAZOR.md\">BLAZOR.md<\/span>. Starter config: <span class=\"ref\" title=\"../../templates/stacks/dotnet/\"><code>templates/stacks/dotnet/<\/code><\/span> + root <code>.editorconfig<\/code>.<\/p>\n<p><strong>Relationship to Microsoft guidance:<\/strong> these rules apply Microsoft&#x27;s <a href=\"https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions\" target=\"_blank\" rel=\"noopener\">C# coding conventions<\/a>, <a href=\"https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/identifier-names\" target=\"_blank\" rel=\"noopener\">identifier naming rules<\/a> and <a href=\"https://learn.microsoft.com/dotnet/standard/design-guidelines/\" target=\"_blank\" rel=\"noopener\">.NET Framework Design Guidelines<\/a>. Where a rule below is silent, follow Microsoft&#x27;s guidance. Style rules are enforced by the root <code>.editorconfig<\/code>, which wins over this document for style/formatting (see <span class=\"ref\" title=\"README.md#precedence\">README.md<\/span>).<\/p>",
+   "rules": [
+    {
+     "id": "NET-01",
+     "level": "MUST",
+     "category": "Project setup",
+     "html": "<p><code>Directory.Build.props<\/code> enables for all projects: <code>&lt;Nullable&gt;enable&lt;/Nullable&gt;<\/code>, <code>&lt;ImplicitUsings&gt;enable&lt;/ImplicitUsings&gt;<\/code>, <code>&lt;TreatWarningsAsErrors&gt;true&lt;/TreatWarningsAsErrors&gt;<\/code>, <code>&lt;AnalysisLevel&gt;latest-recommended&lt;/AnalysisLevel&gt;<\/code>, <code>&lt;EnforceCodeStyleInBuild&gt;true&lt;/EnforceCodeStyleInBuild&gt;<\/code>.<\/p>",
+     "text": "`Directory.Build.props` enables for all projects: `<Nullable>enable<\/Nullable>`, `<ImplicitUsings>enable<\/ImplicitUsings>`, `<TreatWarningsAsErrors>true<\/TreatWarningsAsErrors>`, `<AnalysisLevel>latest-recommended<\/AnalysisLevel>`, `<EnforceCodeStyleInBuild>true<\/EnforceCodeStyleInBuild>`."
+    },
+    {
+     "id": "NET-02",
+     "level": "MUST",
+     "category": "Project setup",
+     "html": "<p>Central Package Management (<code>Directory.Packages.props<\/code>); no versions in individual <code>.csproj<\/code> files. Lock files enabled.<\/p>",
+     "text": "Central Package Management (`Directory.Packages.props`); no versions in individual `.csproj` files. Lock files enabled."
+    },
+    {
+     "id": "NET-03",
+     "level": "MUST",
+     "category": "Project setup",
+     "html": "<p><code>dotnet format --verify-no-changes<\/code> passes (wired as <code>make lint<\/code>).<\/p>",
+     "text": "`dotnet format --verify-no-changes` passes (wired as `make lint`)."
+    },
+    {
+     "id": "NET-04",
+     "level": "SHOULD",
+     "category": "Project setup",
+     "html": "<p>Solution layout:<\/p>\n<pre><code>src/&lt;Product&gt;.Api/            ASP.NET Core host: endpoints, DI, middleware\nsrc/&lt;Product&gt;.Web/            Blazor Web App (UI) — only if the product has a Blazor UI\nsrc/&lt;Product&gt;.Web.Client/     browser-side components — only for WebAssembly/Auto render modes\nsrc/&lt;Product&gt;.Domain/         entities, value objects, domain services (no framework refs)\nsrc/&lt;Product&gt;.Infrastructure/ EF Core, external clients, messaging\ntests/&lt;Product&gt;.UnitTests/\ntests/&lt;Product&gt;.IntegrationTests/\ntests/&lt;Product&gt;.ComponentTests/   bUnit (Blazor)\ntests/&lt;Product&gt;.AcceptanceTests/  API acceptance, and Playwright E2E for UI flows<\/code><\/pre>\n<p>Small services may collapse Domain + Infrastructure into feature folders in one project (vertical slices) — record the choice in an ADR.<\/p>",
+     "text": "Solution layout: ``` src/<Product>.Api/ ASP.NET Core host: endpoints, DI, middleware src/<Product>.Web/ Blazor Web App (UI) — only if the product has a Blazor UI src/<Product>.Web.Client/ browser-side components — only for WebAssembly/Auto render modes src/<Product>.Domain/ entities, value objects, domain services (no framework refs) src/<Product>.Infrastructure/ EF Core, external clients, messaging tests/<Product>.UnitTests/ tests/<Product>.IntegrationTests/ tests/<Product>.ComponentTests/ bUnit (Blazor) tests/<Product>.AcceptanceTests/ API acceptance, and Playwright E2E for UI flows ``` Small services may collapse Domain + Infrastructure into feature folders in one project (vertical slices) — record the choice in an ADR."
+    },
+    {
+     "id": "NET-10",
+     "level": "MUST",
+     "category": "Naming & style",
+     "html": "<p>PascalCase for types, methods, properties, events, constants and public fields; camelCase for locals and parameters; <code>_camelCase<\/code> for private instance fields, <code>s_camelCase<\/code> for private/internal static fields, <code>t_camelCase<\/code> for thread-static; interfaces prefixed <code>I<\/code>; type parameters <code>T<\/code> or <code>T<\/code>-prefixed (<code>TKey<\/code>); async methods suffixed <code>Async<\/code>. No Hungarian notation, no abbreviations that are not widely known.<\/p>",
+     "text": "PascalCase for types, methods, properties, events, constants and public fields; camelCase for locals and parameters; `_camelCase` for private instance fields, `s_camelCase` for private/internal static fields, `t_camelCase` for thread-static; interfaces prefixed `I`; type parameters `T` or `T`-prefixed (`TKey`); async methods suffixed `Async`. No Hungarian notation, no abbreviations that are not widely known."
+    },
+    {
+     "id": "NET-11",
+     "level": "MUST",
+     "category": "Naming & style",
+     "html": "<p>File-scoped namespaces matching folder structure; one public type per file. <code>using<\/code> directives outside the namespace, <code>System<\/code> first.<\/p>",
+     "text": "File-scoped namespaces matching folder structure; one public type per file. `using` directives outside the namespace, `System` first."
+    },
+    {
+     "id": "NET-15",
+     "level": "MUST",
+     "category": "Naming & style",
+     "html": "<p>Allman braces (opening brace on its own line), four-space indent, braces on every <code>if<\/code>/<code>else<\/code>/loop body, one statement and one declaration per line.<\/p>",
+     "text": "Allman braces (opening brace on its own line), four-space indent, braces on every `if`/`else`/loop body, one statement and one declaration per line."
+    },
+    {
+     "id": "NET-16",
+     "level": "MUST",
+     "category": "Naming & style",
+     "html": "<p>Public and protected APIs of libraries and HTTP endpoints have XML doc comments (<code>&lt;summary&gt;<\/code>, parameters, exceptions) — see GEN-21. Missing docs are caught in review, not by build warning CS1591.<\/p>",
+     "text": "Public and protected APIs of libraries and HTTP endpoints have XML doc comments (`<summary>`, parameters, exceptions) — see GEN-21. Missing docs are caught in review, not by build warning CS1591."
+    },
+    {
+     "id": "NET-17",
+     "level": "MUST",
+     "category": "Naming & style",
+     "html": "<p>Use <code>using<\/code> declarations / <code>await using<\/code> for every <code>IDisposable<\/code> / <code>IAsyncDisposable<\/code> you create; implement the dispose pattern only when you own unmanaged resources.<\/p>",
+     "text": "Use `using` declarations / `await using` for every `IDisposable` / `IAsyncDisposable` you create; implement the dispose pattern only when you own unmanaged resources."
+    },
+    {
+     "id": "NET-18",
+     "level": "SHOULD",
+     "category": "Naming & style",
+     "html": "<p>Strings: interpolation for short composition, <code>StringBuilder<\/code> for loops, <code>const<\/code>/raw string literals for fixed text; <code>string.IsNullOrWhiteSpace<\/code>, <code>is null<\/code> / <code>is not null<\/code> (not <code>== null<\/code>); <code>nameof<\/code> instead of string literals for member names; ordinal comparison (<code>StringComparison.Ordinal*<\/code>) unless culture-aware behaviour is required.<\/p>",
+     "text": "Strings: interpolation for short composition, `StringBuilder` for loops, `const`/raw string literals for fixed text; `string.IsNullOrWhiteSpace`, `is null` / `is not null` (not `== null`); `nameof` instead of string literals for member names; ordinal comparison (`StringComparison.Ordinal*`) unless culture-aware behaviour is required."
+    },
+    {
+     "id": "NET-19",
+     "level": "SHOULD",
+     "category": "Naming & style",
+     "html": "<p>LINQ for clear queries and transformations, plain loops where LINQ would hide side effects or allocate on hot paths; materialise (<code>ToList<\/code>/<code>ToArray<\/code>) deliberately, never enumerate a deferred query twice.<\/p>",
+     "text": "LINQ for clear queries and transformations, plain loops where LINQ would hide side effects or allocate on hot paths; materialise (`ToList`/`ToArray`) deliberately, never enumerate a deferred query twice."
+    },
+    {
+     "id": "NET-12",
+     "level": "SHOULD",
+     "category": "Naming & style",
+     "html": "<p>Use <code>var<\/code> for locals everywhere, including built-in types (enforced by <code>.editorconfig<\/code>); spell the type out only where <code>var<\/code> would change the meaning (e.g. <code>IEnumerable&lt;int&gt; q = list;<\/code>).<\/p>",
+     "text": "Use `var` for locals everywhere, including built-in types (enforced by `.editorconfig`); spell the type out only where `var` would change the meaning (e.g. `IEnumerable<int> q = list;`)."
+    },
+    {
+     "id": "NET-12a",
+     "level": "MUST",
+     "category": "Naming & style",
+     "html": "<p><code>.cs<\/code>, <code>.razor<\/code> and project files use CRLF line endings (set in <code>.editorconfig<\/code>); add a <code>.gitattributes<\/code> with <code>*.cs text eol=crlf<\/code> (and the same for <code>*.razor<\/code>, <code>*.csproj<\/code>, <code>*.sln<\/code>) so Git does not rewrite them.<\/p>",
+     "text": "`.cs`, `.razor` and project files use CRLF line endings (set in `.editorconfig`); add a `.gitattributes` with `*.cs text eol=crlf` (and the same for `*.razor`, `*.csproj`, `*.sln`) so Git does not rewrite them."
+    },
+    {
+     "id": "NET-12b",
+     "level": "SHOULD",
+     "category": "Naming & style",
+     "html": "<p>All analyzer diagnostics are warnings (errors in the build); suppress a specific one only in <code>.editorconfig<\/code> with a comment explaining why.<\/p>",
+     "text": "All analyzer diagnostics are warnings (errors in the build); suppress a specific one only in `.editorconfig` with a comment explaining why."
+    },
+    {
+     "id": "NET-13",
+     "level": "SHOULD",
+     "category": "Naming & style",
+     "html": "<p><code>sealed<\/code> by default for classes not designed for inheritance; <code>record<\/code> / <code>record struct<\/code> for immutable data and value objects; primary constructors for simple DI; <code>required<\/code> / <code>init<\/code> / <code>readonly<\/code> to make invalid objects unrepresentable.<\/p>",
+     "text": "`sealed` by default for classes not designed for inheritance; `record` / `record struct` for immutable data and value objects; primary constructors for simple DI; `required` / `init` / `readonly` to make invalid objects unrepresentable."
+    },
+    {
+     "id": "NET-14",
+     "level": "SHOULD",
+     "category": "Naming & style",
+     "html": "<p>Use pattern matching, switch expressions and collection expressions where they improve clarity.<\/p>",
+     "text": "Use pattern matching, switch expressions and collection expressions where they improve clarity."
+    },
+    {
+     "id": "NET-20",
+     "level": "MUST",
+     "category": "Nullability & types",
+     "html": "<p>No nullable warnings suppressed with <code>!<\/code> without a comment explaining why it is safe.<\/p>",
+     "text": "No nullable warnings suppressed with `!` without a comment explaining why it is safe."
+    },
+    {
+     "id": "NET-21",
+     "level": "MUST",
+     "category": "Nullability & types",
+     "html": "<p>Validate public inputs with guard clauses (<code>ArgumentNullException.ThrowIfNull<\/code>, <code>ArgumentOutOfRangeException.ThrowIfNegative<\/code>, …) or validators at the API edge.<\/p>",
+     "text": "Validate public inputs with guard clauses (`ArgumentNullException.ThrowIfNull`, `ArgumentOutOfRangeException.ThrowIfNegative`, …) or validators at the API edge."
+    },
+    {
+     "id": "NET-22",
+     "level": "SHOULD",
+     "category": "Nullability & types",
+     "html": "<p>Value objects for domain concepts with rules (<code>Money<\/code>, <code>InvoiceNumber<\/code>, <code>EmailAddress<\/code>) instead of primitives. <code>decimal<\/code> for money, never <code>double<\/code>.<\/p>",
+     "text": "Value objects for domain concepts with rules (`Money`, `InvoiceNumber`, `EmailAddress`) instead of primitives. `decimal` for money, never `double`."
+    },
+    {
+     "id": "NET-23",
+     "level": "MUST",
+     "category": "Nullability & types",
+     "html": "<p>Use <code>DateTimeOffset<\/code> (UTC) and inject <code>TimeProvider<\/code> — never <code>DateTime.Now<\/code> in logic.<\/p>",
+     "text": "Use `DateTimeOffset` (UTC) and inject `TimeProvider` — never `DateTime.Now` in logic."
+    },
+    {
+     "id": "NET-30",
+     "level": "MUST",
+     "category": "Async",
+     "html": "<p>Async all the way: no <code>.Result<\/code>, <code>.Wait()<\/code> or <code>GetAwaiter().GetResult()<\/code>. No <code>async void<\/code> except event handlers.<\/p>",
+     "text": "Async all the way: no `.Result`, `.Wait()` or `GetAwaiter().GetResult()`. No `async void` except event handlers."
+    },
+    {
+     "id": "NET-31",
+     "level": "MUST",
+     "category": "Async",
+     "html": "<p>Accept and pass <code>CancellationToken<\/code> through every async I/O path.<\/p>",
+     "text": "Accept and pass `CancellationToken` through every async I/O path."
+    },
+    {
+     "id": "NET-32",
+     "level": "SHOULD",
+     "category": "Async",
+     "html": "<p><code>ConfigureAwait(false)<\/code> in library code that may be used outside ASP.NET Core.<\/p>",
+     "text": "`ConfigureAwait(false)` in library code that may be used outside ASP.NET Core."
+    },
+    {
+     "id": "NET-40",
+     "level": "MUST",
+     "category": "Errors",
+     "html": "<p>Don&#x27;t use exceptions for expected business outcomes; return a result type or domain error. Throw for programmer errors and infrastructure faults.<\/p>",
+     "text": "Don't use exceptions for expected business outcomes; return a result type or domain error. Throw for programmer errors and infrastructure faults."
+    },
+    {
+     "id": "NET-41",
+     "level": "MUST",
+     "category": "Errors",
+     "html": "<p>Global exception handling via <code>IExceptionHandler<\/code> + <code>AddProblemDetails()<\/code> producing RFC 9457 responses; no stack traces to clients.<\/p>",
+     "text": "Global exception handling via `IExceptionHandler` + `AddProblemDetails()` producing RFC 9457 responses; no stack traces to clients."
+    },
+    {
+     "id": "NET-42",
+     "level": "MUST",
+     "category": "Errors",
+     "html": "<p>Catch specific exceptions only; <code>catch (Exception)<\/code> only at boundaries, and it must log and rethrow or translate.<\/p>",
+     "text": "Catch specific exceptions only; `catch (Exception)` only at boundaries, and it must log and rethrow or translate."
+    },
+    {
+     "id": "NET-50",
+     "level": "SHOULD",
+     "category": "ASP.NET Core",
+     "html": "<p>Minimal APIs with endpoint groups per feature (<code>MapGroup<\/code>), or controllers — one style per solution, chosen in an ADR.<\/p>",
+     "text": "Minimal APIs with endpoint groups per feature (`MapGroup`), or controllers — one style per solution, chosen in an ADR."
+    },
+    {
+     "id": "NET-51",
+     "level": "MUST",
+     "category": "ASP.NET Core",
+     "html": "<p>Request/response DTOs separate from domain entities and EF models; explicit mapping (hand-written or source-generated). Check licences before adopting mapping/mediator libraries — several popular ones moved to commercial licences.<\/p>",
+     "text": "Request/response DTOs separate from domain entities and EF models; explicit mapping (hand-written or source-generated). Check licences before adopting mapping/mediator libraries — several popular ones moved to commercial licences."
+    },
+    {
+     "id": "NET-52",
+     "level": "MUST",
+     "category": "ASP.NET Core",
+     "html": "<p>Options pattern for configuration (<code>IOptions&lt;T&gt;<\/code> with <code>ValidateDataAnnotations().ValidateOnStart()<\/code>); secrets from user-secrets locally and a vault in deployed environments.<\/p>",
+     "text": "Options pattern for configuration (`IOptions<T>` with `ValidateDataAnnotations().ValidateOnStart()`); secrets from user-secrets locally and a vault in deployed environments."
+    },
+    {
+     "id": "NET-53",
+     "level": "MUST",
+     "category": "ASP.NET Core",
+     "html": "<p>Typed <code>HttpClient<\/code> via <code>IHttpClientFactory<\/code> with resilience handlers (<code>Microsoft.Extensions.Http.Resilience<\/code>: timeout, retry, circuit breaker).<\/p>",
+     "text": "Typed `HttpClient` via `IHttpClientFactory` with resilience handlers (`Microsoft.Extensions.Http.Resilience`: timeout, retry, circuit breaker)."
+    },
+    {
+     "id": "NET-54",
+     "level": "MUST",
+     "category": "ASP.NET Core",
+     "html": "<p>Authentication/authorisation policies applied to endpoint groups; endpoints are secure by default (<code>RequireAuthorization()<\/code> on the root group).<\/p>",
+     "text": "Authentication/authorisation policies applied to endpoint groups; endpoints are secure by default (`RequireAuthorization()` on the root group)."
+    },
+    {
+     "id": "NET-55",
+     "level": "SHOULD",
+     "category": "ASP.NET Core",
+     "html": "<p>Health checks (<code>/health/live<\/code>, <code>/health/ready<\/code>), OpenAPI generation, and OpenTelemetry (traces, metrics, logs) wired in <code>Program.cs<\/code>.<\/p>",
+     "text": "Health checks (`/health/live`, `/health/ready`), OpenAPI generation, and OpenTelemetry (traces, metrics, logs) wired in `Program.cs`."
+    },
+    {
+     "id": "NET-56",
+     "level": "SHOULD",
+     "category": "ASP.NET Core",
+     "html": "<p>JSON with <code>System.Text.Json<\/code>; use source generation (<code>JsonSerializerContext<\/code>) on hot paths and for trimmed/AOT/WebAssembly targets; camelCase property naming per BE-11.<\/p>",
+     "text": "JSON with `System.Text.Json`; use source generation (`JsonSerializerContext`) on hot paths and for trimmed/AOT/WebAssembly targets; camelCase property naming per BE-11."
+    },
+    {
+     "id": "NET-60",
+     "level": "MUST",
+     "category": "Data (EF Core)",
+     "html": "<p>Migrations committed and reviewed; applied by a deployment step, not at app start-up in production.<\/p>",
+     "text": "Migrations committed and reviewed; applied by a deployment step, not at app start-up in production."
+    },
+    {
+     "id": "NET-61",
+     "level": "MUST",
+     "category": "Data (EF Core)",
+     "html": "<p><code>AsNoTracking()<\/code> for read-only queries; project to DTOs with <code>Select<\/code> instead of loading full graphs; no lazy loading.<\/p>",
+     "text": "`AsNoTracking()` for read-only queries; project to DTOs with `Select` instead of loading full graphs; no lazy loading."
+    },
+    {
+     "id": "NET-62",
+     "level": "MUST",
+     "category": "Data (EF Core)",
+     "html": "<p>No raw SQL string concatenation; use <code>FromSql<\/code> with interpolated parameters.<\/p>",
+     "text": "No raw SQL string concatenation; use `FromSql` with interpolated parameters."
+    },
+    {
+     "id": "NET-63",
+     "level": "SHOULD",
+     "category": "Data (EF Core)",
+     "html": "<p><code>DbContext<\/code> lifetime = request scope; no repository wrapper over EF unless it adds real domain value (EF already is a unit of work/repository).<\/p>",
+     "text": "`DbContext` lifetime = request scope; no repository wrapper over EF unless it adds real domain value (EF already is a unit of work/repository)."
+    },
+    {
+     "id": "NET-70",
+     "level": "MUST",
+     "category": "Logging",
+     "html": "<p><code>ILogger&lt;T&gt;<\/code> with <strong>message templates<\/strong> (<code>&quot;Invoice {InvoiceId} rejected&quot;<\/code>), never string interpolation. Prefer <code>[LoggerMessage]<\/code> source-generated methods on hot paths.<\/p>",
+     "text": "`ILogger<T>` with **message templates** (`\"Invoice {InvoiceId} rejected\"`), never string interpolation. Prefer `[LoggerMessage]` source-generated methods on hot paths."
+    },
+    {
+     "id": "NET-71",
+     "level": "MUST",
+     "category": "Logging",
+     "html": "<p>No PII/secrets in log properties; enrich with trace/correlation id.<\/p>",
+     "text": "No PII/secrets in log properties; enrich with trace/correlation id."
+    },
+    {
+     "id": "NET-80",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>xUnit (v3 preferred) with an assertion library chosen in the stack ADR (e.g. Shouldly or AwesomeAssertions; check licence terms of others).<\/p>",
+     "text": "xUnit (v3 preferred) with an assertion library chosen in the stack ADR (e.g. Shouldly or AwesomeAssertions; check licence terms of others)."
+    },
+    {
+     "id": "NET-81",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>Acceptance tests named with the AC id in the <strong>method name<\/strong> so it reaches JUnit results:<\/p>\n<pre><code class=\"lang-csharp\">public sealed class InvoiceIntakeTests(ApiFactory factory) : IClassFixture&lt;ApiFactory&gt;\n{\n    [Fact]\n    public async Task AC_001_Valid_invoice_is_accepted()\n    {\n        // Arrange\n        var client = factory.CreateClient();\n        // Act\n        var response = await client.PostAsJsonAsync(&quot;/v1/invoices&quot;, ValidInvoice());\n        // Assert\n        response.StatusCode.ShouldBe(HttpStatusCode.Created);\n    }\n}<\/code><\/pre>",
+     "text": "Acceptance tests named with the AC id in the **method name** so it reaches JUnit results: ```csharp public sealed class InvoiceIntakeTests(ApiFactory factory) : IClassFixture<ApiFactory> { [Fact] public async Task AC_001_Valid_invoice_is_accepted() { // Arrange var client = factory.CreateClient(); // Act var response = await client.PostAsJsonAsync(\"/v1/invoices\", ValidInvoice()); // Assert response.StatusCode.ShouldBe(HttpStatusCode.Created); } } ```"
+    },
+    {
+     "id": "NET-82",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>API tests use <code>WebApplicationFactory&lt;Program&gt;<\/code>; database tests use Testcontainers (real SQL Server/PostgreSQL), not the EF in-memory provider.<\/p>",
+     "text": "API tests use `WebApplicationFactory<Program>`; database tests use Testcontainers (real SQL Server/PostgreSQL), not the EF in-memory provider."
+    },
+    {
+     "id": "NET-83",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>JUnit output for traceability, written to <code>reports/<\/code>. With the VSTest runner: <code>dotnet test --logger &quot;junit;LogFilePath=$(pwd)/reports/{assembly}.xml&quot;<\/code> (package <code>JunitXml.TestLogger<\/code> in test projects). xUnit v3 test projects run on Microsoft Testing Platform; if the logger does not apply, use the runner&#x27;s native JUnit report option instead and record the working command in the stack ADR and the <code>Makefile<\/code>. <code>make trace<\/code> must show results.<\/p>",
+     "text": "JUnit output for traceability, written to `reports/`. With the VSTest runner: `dotnet test --logger \"junit;LogFilePath=$(pwd)/reports/{assembly}.xml\"` (package `JunitXml.TestLogger` in test projects). xUnit v3 test projects run on Microsoft Testing Platform; if the logger does not apply, use the runner's native JUnit report option instead and record the working command in the stack ADR and the `Makefile`. `make trace` must show results."
+    },
+    {
+     "id": "NET-84",
+     "level": "SHOULD",
+     "category": "Testing",
+     "html": "<p>Mock only external boundaries (NSubstitute or similar); no mocking of <code>DbContext<\/code> or classes you own just to reach coverage.<\/p>",
+     "text": "Mock only external boundaries (NSubstitute or similar); no mocking of `DbContext` or classes you own just to reach coverage."
+    }
+   ]
+  },
+  {
+   "key": "BLAZOR",
+   "label": "Blazor",
+   "description": "Blazor (ASP.NET Core Razor components) frontend standards — render modes, components, lifecycle, state, forms, security, performance and testing with AC traceability.",
+   "appliesTo": "**/*.razor, **/*.razor.cs, **/*.razor.css, **/*.razor.js, **/*.cshtml, **/_Imports.razor",
+   "introHtml": "<p>Baseline: <strong>current .NET LTS<\/strong> (pinned in <code>global.json<\/code>) with Blazor Web App (Razor components). Builds on <span class=\"ref\" title=\"GENERAL.md\">GENERAL.md<\/span>, <span class=\"ref\" title=\"FRONTEND.md\">FRONTEND.md<\/span> and <span class=\"ref\" title=\"DOTNET.md\">DOTNET.md<\/span> — all C# rules (<code>NET-<\/code>) apply to <code>.razor<\/code> <code>@code<\/code> blocks and <code>.razor.cs<\/code> files. <span class=\"ref\" title=\"BACKEND.md\">BACKEND.md<\/span> applies to server-side/API code only, not to components. Starter config: <span class=\"ref\" title=\"../../templates/stacks/dotnet/\"><code>templates/stacks/dotnet/<\/code><\/span> + root <code>.editorconfig<\/code>.<\/p>",
+   "rules": [
+    {
+     "id": "BZ-01",
+     "level": "MUST",
+     "category": "Project setup",
+     "html": "<p>The <strong>render mode<\/strong> (static SSR, Interactive Server, WebAssembly, Auto) is chosen per project in an ADR. Default: static SSR with interactive islands only where a feature needs interactivity; set the mode per component/page, not blindly app-wide.<\/p>",
+     "text": "The **render mode** (static SSR, Interactive Server, WebAssembly, Auto) is chosen per project in an ADR. Default: static SSR with interactive islands only where a feature needs interactivity; set the mode per component/page, not blindly app-wide."
+    },
+    {
+     "id": "BZ-02",
+     "level": "SHOULD",
+     "category": "Project setup",
+     "html": "<p>Structure (feature folders, FE-01):<\/p>\n<pre><code>src/&lt;Product&gt;.Web/            host, App.razor, Routes.razor, Program.cs, server-only features\n  Features/&lt;Feature&gt;/         pages, components, &lt;Feature&gt;.razor.cs, &lt;Feature&gt;.razor.css\n  Shared/                     layout, design-system wrappers\nsrc/&lt;Product&gt;.Web.Client/     only when WebAssembly/Auto: components that must run in the browser\ntests/&lt;Product&gt;.ComponentTests/   bUnit\ntests/&lt;Product&gt;.E2ETests/         Playwright for .NET (acceptance)<\/code><\/pre>\n<p>Features do not reach into each other&#x27;s internals; share via <code>Shared/<\/code> or a public service.<\/p>",
+     "text": "Structure (feature folders, FE-01): ``` src/<Product>.Web/ host, App.razor, Routes.razor, Program.cs, server-only features Features/<Feature>/ pages, components, <Feature>.razor.cs, <Feature>.razor.css Shared/ layout, design-system wrappers src/<Product>.Web.Client/ only when WebAssembly/Auto: components that must run in the browser tests/<Product>.ComponentTests/ bUnit tests/<Product>.E2ETests/ Playwright for .NET (acceptance) ``` Features do not reach into each other's internals; share via `Shared/` or a public service."
+    },
+    {
+     "id": "BZ-03",
+     "level": "MUST",
+     "category": "Project setup",
+     "html": "<p>Nullable reference types and analyzers are on for Razor projects too (<code>Directory.Build.props<\/code>, NET-01); <code>.razor<\/code> files produce no warnings.<\/p>",
+     "text": "Nullable reference types and analyzers are on for Razor projects too (`Directory.Build.props`, NET-01); `.razor` files produce no warnings."
+    },
+    {
+     "id": "BZ-10",
+     "level": "MUST",
+     "category": "Components",
+     "html": "<p>One component per file, file named after the component (<code>InvoiceTable.razor<\/code>). Move logic beyond a few lines into a partial class <code>InvoiceTable.razor.cs<\/code>; keep markup and <code>@code<\/code> small (&lt; ~150 lines per component, FE-02).<\/p>",
+     "text": "One component per file, file named after the component (`InvoiceTable.razor`). Move logic beyond a few lines into a partial class `InvoiceTable.razor.cs`; keep markup and `@code` small (< ~150 lines per component, FE-02)."
+    },
+    {
+     "id": "BZ-11",
+     "level": "MUST",
+     "category": "Components",
+     "html": "<p>Parameters are <code>[Parameter]<\/code> properties with <code>[EditorRequired]<\/code> when mandatory. A component never mutates its own parameters; communicate upward with <code>EventCallback<\/code> / <code>EventCallback&lt;T&gt;<\/code>, not <code>Action<\/code>/<code>Func<\/code>.<\/p>",
+     "text": "Parameters are `[Parameter]` properties with `[EditorRequired]` when mandatory. A component never mutates its own parameters; communicate upward with `EventCallback` / `EventCallback<T>`, not `Action`/`Func`."
+    },
+    {
+     "id": "BZ-12",
+     "level": "MUST",
+     "category": "Components",
+     "html": "<p>Use <code>@key<\/code> with a stable data id on dynamic lists — never the loop index.<\/p>",
+     "text": "Use `@key` with a stable data id on dynamic lists — never the loop index."
+    },
+    {
+     "id": "BZ-13",
+     "level": "SHOULD",
+     "category": "Components",
+     "html": "<p>Business rules live in plain C# classes/services (no <code>ComponentBase<\/code>), unit tested without rendering (FE-02). Prefer composition (<code>RenderFragment<\/code>, <code>ChildContent<\/code>) over boolean configuration flags.<\/p>",
+     "text": "Business rules live in plain C# classes/services (no `ComponentBase`), unit tested without rendering (FE-02). Prefer composition (`RenderFragment`, `ChildContent`) over boolean configuration flags."
+    },
+    {
+     "id": "BZ-14",
+     "level": "SHOULD",
+     "category": "Components",
+     "html": "<p>Scoped CSS (<code>Component.razor.css<\/code>) and design tokens (CSS variables) instead of inline <code>style<\/code> (FE-04). One component library per project, chosen by ADR with a <strong>licence check<\/strong> (some popular libraries are commercial).<\/p>",
+     "text": "Scoped CSS (`Component.razor.css`) and design tokens (CSS variables) instead of inline `style` (FE-04). One component library per project, chosen by ADR with a **licence check** (some popular libraries are commercial)."
+    },
+    {
+     "id": "BZ-20",
+     "level": "MUST",
+     "category": "Lifecycle & async",
+     "html": "<p>Use the async lifecycle methods (<code>OnInitializedAsync<\/code>, <code>OnParametersSetAsync<\/code>) for data loading; never block (<code>.Result<\/code>, <code>.Wait()<\/code> — NET-30). Pass the component&#x27;s <code>CancellationToken<\/code> (a <code>CancellationTokenSource<\/code> cancelled in <code>Dispose<\/code>) to I/O (NET-31).<\/p>",
+     "text": "Use the async lifecycle methods (`OnInitializedAsync`, `OnParametersSetAsync`) for data loading; never block (`.Result`, `.Wait()` — NET-30). Pass the component's `CancellationToken` (a `CancellationTokenSource` cancelled in `Dispose`) to I/O (NET-31)."
+    },
+    {
+     "id": "BZ-21",
+     "level": "MUST",
+     "category": "Lifecycle & async",
+     "html": "<p>Components that subscribe to events, timers or JS objects implement <code>IDisposable<\/code>/<code>IAsyncDisposable<\/code> and release them.<\/p>",
+     "text": "Components that subscribe to events, timers or JS objects implement `IDisposable`/`IAsyncDisposable` and release them."
+    },
+    {
+     "id": "BZ-22",
+     "level": "MUST",
+     "category": "Lifecycle & async",
+     "html": "<p>JavaScript interop only from <code>OnAfterRenderAsync<\/code> (or event handlers), through <strong>isolated JS modules<\/strong> (<code>import<\/code>), wrapped in a typed C# service. No <code>eval<\/code>; no global JS state.<\/p>",
+     "text": "JavaScript interop only from `OnAfterRenderAsync` (or event handlers), through **isolated JS modules** (`import`), wrapped in a typed C# service. No `eval`; no global JS state."
+    },
+    {
+     "id": "BZ-23",
+     "level": "SHOULD",
+     "category": "Lifecycle & async",
+     "html": "<p>Don&#x27;t call <code>StateHasChanged<\/code> by hand except after work outside Blazor&#x27;s event flow (then <code>await InvokeAsync(StateHasChanged)<\/code>). Don&#x27;t derive state in effects; compute it.<\/p>",
+     "text": "Don't call `StateHasChanged` by hand except after work outside Blazor's event flow (then `await InvokeAsync(StateHasChanged)`). Don't derive state in effects; compute it."
+    },
+    {
+     "id": "BZ-30",
+     "level": "MUST",
+     "category": "State & data",
+     "html": "<p>Classify state (FE-10): URL state with <code>[SupplyParameterFromQuery]<\/code> / route parameters; form state in <code>EditForm<\/code> models; local UI state in the component; shared client state in a scoped <strong>state-container service<\/strong> with a change event. Cascading values only for low-frequency data (theme, auth state).<\/p>",
+     "text": "Classify state (FE-10): URL state with `[SupplyParameterFromQuery]` / route parameters; form state in `EditForm` models; local UI state in the component; shared client state in a scoped **state-container service** with a change event. Cascading values only for low-frequency data (theme, auth state)."
+    },
+    {
+     "id": "BZ-31",
+     "level": "MUST",
+     "category": "State & data",
+     "html": "<p>Server data goes through typed services / a typed <code>HttpClient<\/code> (NET-53, FE-03); no <code>HttpClient<\/code> calls scattered through components. Don&#x27;t copy server data into long-lived client state (FE-11).<\/p>",
+     "text": "Server data goes through typed services / a typed `HttpClient` (NET-53, FE-03); no `HttpClient` calls scattered through components. Don't copy server data into long-lived client state (FE-11)."
+    },
+    {
+     "id": "BZ-32",
+     "level": "SHOULD",
+     "category": "State & data",
+     "html": "<p>Pre-rendered pages persist state handed to the interactive phase with <code>PersistentComponentState<\/code> (or <code>[PersistentState]<\/code> where available) to avoid double loading and flicker.<\/p>",
+     "text": "Pre-rendered pages persist state handed to the interactive phase with `PersistentComponentState` (or `[PersistentState]` where available) to avoid double loading and flicker."
+    },
+    {
+     "id": "BZ-33",
+     "level": "SHOULD",
+     "category": "State & data",
+     "html": "<p>Long lists use <code>&lt;Virtualize&gt;<\/code> (FE-42); slow data uses streaming rendering (<code>[StreamRendering]<\/code>) or a skeleton, never a blank page (FE-20).<\/p>",
+     "text": "Long lists use `<Virtualize>` (FE-42); slow data uses streaming rendering (`[StreamRendering]`) or a skeleton, never a blank page (FE-20)."
+    },
+    {
+     "id": "BZ-40",
+     "level": "MUST",
+     "category": "Server vs WebAssembly safety",
+     "html": "<p>Interactive Server: scoped services live per <strong>circuit<\/strong>. Use <code>IDbContextFactory&lt;T&gt;<\/code> (not an injected scoped <code>DbContext<\/code>) for EF Core; no mutable <code>static<\/code> state; no <code>IHttpContextAccessor<\/code>/<code>HttpContext<\/code> in interactive components — flow the needed values in via cascading authentication state or parameters.<\/p>",
+     "text": "Interactive Server: scoped services live per **circuit**. Use `IDbContextFactory<T>` (not an injected scoped `DbContext`) for EF Core; no mutable `static` state; no `IHttpContextAccessor`/`HttpContext` in interactive components — flow the needed values in via cascading authentication state or parameters."
+    },
+    {
+     "id": "BZ-41",
+     "level": "MUST",
+     "category": "Server vs WebAssembly safety",
+     "html": "<p>WebAssembly/Auto: everything shipped to the browser is public (FE-51). No secrets or connection strings; call server APIs, never the database. Prefer a backend-for-frontend (BFF) with cookie sessions over tokens in browser storage (FE-52).<\/p>",
+     "text": "WebAssembly/Auto: everything shipped to the browser is public (FE-51). No secrets or connection strings; call server APIs, never the database. Prefer a backend-for-frontend (BFF) with cookie sessions over tokens in browser storage (FE-52)."
+    },
+    {
+     "id": "BZ-42",
+     "level": "SHOULD",
+     "category": "Server vs WebAssembly safety",
+     "html": "<p>Components that must work in both server and WebAssembly depend on an interface; each host registers its own implementation.<\/p>",
+     "text": "Components that must work in both server and WebAssembly depend on an interface; each host registers its own implementation."
+    },
+    {
+     "id": "BZ-50",
+     "level": "MUST",
+     "category": "Forms",
+     "html": "<p><code>EditForm<\/code> with a model, <code>DataAnnotationsValidator<\/code> (or an ADR-approved validator) and <code>ValidationMessage<\/code> per field (FE-21). Reuse the API&#x27;s validation rules/contract; the API stays authoritative.<\/p>",
+     "text": "`EditForm` with a model, `DataAnnotationsValidator` (or an ADR-approved validator) and `ValidationMessage` per field (FE-21). Reuse the API's validation rules/contract; the API stays authoritative."
+    },
+    {
+     "id": "BZ-51",
+     "level": "MUST",
+     "category": "Forms",
+     "html": "<p>Disable the submit control while a submission runs; preserve user input on error; confirm destructive actions (FE-21).<\/p>",
+     "text": "Disable the submit control while a submission runs; preserve user input on error; confirm destructive actions (FE-21)."
+    },
+    {
+     "id": "BZ-60",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>No <code>MarkupString<\/code> (or <code>@((MarkupString)…)<\/code>) built from user or external data unless sanitised with a vetted library (FE-50). Razor&#x27;s default encoding is relied on otherwise.<\/p>",
+     "text": "No `MarkupString` (or `@((MarkupString)…)`) built from user or external data unless sanitised with a vetted library (FE-50). Razor's default encoding is relied on otherwise."
+    },
+    {
+     "id": "BZ-61",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>Antiforgery enabled for form posts (<code>UseAntiforgery<\/code>, <code>&lt;AntiforgeryToken /&gt;<\/code> in static SSR forms). Apply a Content Security Policy (FE-52).<\/p>",
+     "text": "Antiforgery enabled for form posts (`UseAntiforgery`, `<AntiforgeryToken />` in static SSR forms). Apply a Content Security Policy (FE-52)."
+    },
+    {
+     "id": "BZ-62",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p><code>[Authorize]<\/code> on pages and <code>AuthorizeView<\/code> in markup are UX only; every API and server method behind them enforces authorisation itself (FE-53, NET-54).<\/p>",
+     "text": "`[Authorize]` on pages and `AuthorizeView` in markup are UX only; every API and server method behind them enforces authorisation itself (FE-53, NET-54)."
+    },
+    {
+     "id": "BZ-63",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>Validate URLs before binding them to <code>href<\/code>/<code>src<\/code>; never bind <code>javascript:<\/code>.<\/p>",
+     "text": "Validate URLs before binding them to `href`/`src`; never bind `javascript:`."
+    },
+    {
+     "id": "BZ-70",
+     "level": "MUST",
+     "category": "Errors & UX",
+     "html": "<p>Wrap each feature (and the layout body) in an <code>&lt;ErrorBoundary&gt;<\/code> with a recovery action. Unhandled-exception UI in production shows no stack traces (NET-41).<\/p>",
+     "text": "Wrap each feature (and the layout body) in an `<ErrorBoundary>` with a recovery action. Unhandled-exception UI in production shows no stack traces (NET-41)."
+    },
+    {
+     "id": "BZ-71",
+     "level": "MUST",
+     "category": "Errors & UX",
+     "html": "<p>Every data-driven component renders loading, empty, error and success states (FE-20). Interactive Server apps provide a custom reconnect/“connection lost” UI.<\/p>",
+     "text": "Every data-driven component renders loading, empty, error and success states (FE-20). Interactive Server apps provide a custom reconnect/“connection lost” UI."
+    },
+    {
+     "id": "BZ-72",
+     "level": "SHOULD",
+     "category": "Errors & UX",
+     "html": "<p>Localise text with <code>IStringLocalizer<\/code> and <code>.resx<\/code> when the product is or may be multilingual (FE-60); format with <code>CultureInfo<\/code>, store UTC (FE-61, NET-23).<\/p>",
+     "text": "Localise text with `IStringLocalizer` and `.resx` when the product is or may be multilingual (FE-60); format with `CultureInfo`, store UTC (FE-61, NET-23)."
+    },
+    {
+     "id": "BZ-80",
+     "level": "MUST",
+     "category": "Accessibility",
+     "html": "<p>FE-30..FE-32 apply to Razor markup: semantic elements, labels via <code>&lt;label for&gt;<\/code>/<code>InputLabel<\/code>, focus managed after navigation and in dialogs (<code>FocusOnNavigate<\/code>, <code>ElementReference.FocusAsync<\/code>).<\/p>",
+     "text": "FE-30..FE-32 apply to Razor markup: semantic elements, labels via `<label for>`/`InputLabel`, focus managed after navigation and in dialogs (`FocusOnNavigate`, `ElementReference.FocusAsync`)."
+    },
+    {
+     "id": "BZ-81",
+     "level": "SHOULD",
+     "category": "Accessibility",
+     "html": "<p>Automated axe checks in the Playwright suite for key pages (FE-33).<\/p>",
+     "text": "Automated axe checks in the Playwright suite for key pages (FE-33)."
+    },
+    {
+     "id": "BZ-90",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>Components are tested with <strong>bUnit<\/strong> + xUnit; query by role/label/text (<code>FindByRole<\/code>-style helpers or accessible text), not CSS classes or ids (FE-70).<\/p>",
+     "text": "Components are tested with **bUnit** + xUnit; query by role/label/text (`FindByRole`-style helpers or accessible text), not CSS classes or ids (FE-70)."
+    },
+    {
+     "id": "BZ-91",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>Acceptance criteria that involve a UI flow have an end-to-end test using <strong>Playwright for .NET<\/strong>, with the AC id in the <strong>method name<\/strong> (FE-71, NET-81):<\/p>\n<pre><code class=\"lang-csharp\">// bUnit v2 base class is BunitContext (TestContext in v1); the Playwright E2E tests follow the same naming.\npublic sealed class InvoiceFormTests : BunitContext\n{\n    [Fact]\n    public void AC_002_Rejects_invoice_with_zero_amount()\n    {\n        // Arrange\n        var cut = Render&lt;InvoiceForm&gt;();\n        // Act\n        cut.Find(&quot;input[aria-label=&#x27;Amount&#x27;]&quot;).Change(&quot;0&quot;);   // accessible attribute, not a CSS class\n        cut.Find(&quot;button[type=submit]&quot;).Click();\n        // Assert\n        cut.Markup.ShouldContain(&quot;Amount must be greater than zero&quot;);\n    }\n}<\/code><\/pre>",
+     "text": "Acceptance criteria that involve a UI flow have an end-to-end test using **Playwright for .NET**, with the AC id in the **method name** (FE-71, NET-81): ```csharp // bUnit v2 base class is BunitContext (TestContext in v1); the Playwright E2E tests follow the same naming. public sealed class InvoiceFormTests : BunitContext { [Fact] public void AC_002_Rejects_invoice_with_zero_amount() { // Arrange var cut = Render<InvoiceForm>(); // Act cut.Find(\"input[aria-label='Amount']\").Change(\"0\"); // accessible attribute, not a CSS class cut.Find(\"button[type=submit]\").Click(); // Assert cut.Markup.ShouldContain(\"Amount must be greater than zero\"); } } ```"
+    },
+    {
+     "id": "BZ-92",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>JUnit output for traceability as NET-83 (test projects write to <code>reports/<\/code>).<\/p>",
+     "text": "JUnit output for traceability as NET-83 (test projects write to `reports/`)."
+    },
+    {
+     "id": "BZ-93",
+     "level": "SHOULD",
+     "category": "Testing",
+     "html": "<p>Fake the HTTP boundary with an <code>HttpMessageHandler<\/code> stub or a test server (FE-72); register fakes for services through bUnit&#x27;s <code>Services<\/code>. Don&#x27;t mock Blazor framework types.<\/p>",
+     "text": "Fake the HTTP boundary with an `HttpMessageHandler` stub or a test server (FE-72); register fakes for services through bUnit's `Services`. Don't mock Blazor framework types."
+    }
+   ]
+  },
+  {
+   "key": "REACT",
+   "label": "React",
+   "description": "React + TypeScript coding standards — project structure, components, hooks, state and data fetching, forms, styling, tooling and testing with AC traceability.",
+   "appliesTo": "**/*.tsx, **/*.ts, **/*.jsx, **/*.js, **/package.json, **/vite.config.*, **/eslint.config.*",
+   "introHtml": "<p>Baseline: <strong>current React major with TypeScript (strict)<\/strong>, Vite (or a framework such as Next.js chosen by ADR), Node LTS. Builds on <span class=\"ref\" title=\"GENERAL.md\">GENERAL.md<\/span> and <span class=\"ref\" title=\"FRONTEND.md\">FRONTEND.md<\/span>. Starter config: <span class=\"ref\" title=\"../../templates/stacks/react/\"><code>templates/stacks/react/<\/code><\/span>.<\/p>",
+   "rules": [
+    {
+     "id": "RE-01",
+     "level": "MUST",
+     "category": "Project setup",
+     "html": "<p>TypeScript <code>strict: true<\/code>, plus <code>noUncheckedIndexedAccess<\/code>; no <code>any<\/code> (use <code>unknown<\/code> + narrowing). <code>@ts-ignore<\/code> is forbidden; <code>@ts-expect-error<\/code> needs a reason.<\/p>",
+     "text": "TypeScript `strict: true`, plus `noUncheckedIndexedAccess`; no `any` (use `unknown` + narrowing). `@ts-ignore` is forbidden; `@ts-expect-error` needs a reason."
+    },
+    {
+     "id": "RE-02",
+     "level": "MUST",
+     "category": "Project setup",
+     "html": "<p>ESLint (flat config) with <code>typescript-eslint<\/code> type-checked rules, <code>react-hooks<\/code> and <code>jsx-a11y<\/code>; Prettier for formatting. <code>npm run lint<\/code> = <code>eslint . &amp;&amp; prettier --check .<\/code>.<\/p>",
+     "text": "ESLint (flat config) with `typescript-eslint` type-checked rules, `react-hooks` and `jsx-a11y`; Prettier for formatting. `npm run lint` = `eslint . && prettier --check .`."
+    },
+    {
+     "id": "RE-03",
+     "level": "MUST",
+     "category": "Project setup",
+     "html": "<p><code>package-lock.json<\/code> committed; <code>npm ci<\/code> in CI; exact versions for build-critical tooling.<\/p>",
+     "text": "`package-lock.json` committed; `npm ci` in CI; exact versions for build-critical tooling."
+    },
+    {
+     "id": "RE-04",
+     "level": "SHOULD",
+     "category": "Project setup",
+     "html": "<p>Structure:<\/p>\n<pre><code>src/\n  app/                 providers, router, global styles, error boundary\n  features/&lt;feature&gt;/  components/, hooks/, api/, model/ (pure logic), &lt;feature&gt;.routes.tsx\n  shared/ui/           design-system components\n  shared/lib/          generic utilities, API client\ntests/e2e/             Playwright acceptance tests<\/code><\/pre>\n<p>Features don&#x27;t import each other&#x27;s internals — only their public <code>index.ts<\/code>.<\/p>",
+     "text": "Structure: ``` src/ app/ providers, router, global styles, error boundary features/<feature>/ components/, hooks/, api/, model/ (pure logic), <feature>.routes.tsx shared/ui/ design-system components shared/lib/ generic utilities, API client tests/e2e/ Playwright acceptance tests ``` Features don't import each other's internals — only their public `index.ts`."
+    },
+    {
+     "id": "RE-10",
+     "level": "MUST",
+     "category": "Components",
+     "html": "<p>Function components only; <strong>named exports<\/strong>; one component per file, file named after the component (<code>InvoiceTable.tsx<\/code>).<\/p>",
+     "text": "Function components only; **named exports**; one component per file, file named after the component (`InvoiceTable.tsx`)."
+    },
+    {
+     "id": "RE-11",
+     "level": "MUST",
+     "category": "Components",
+     "html": "<p>Props typed with a <code>type<\/code>/<code>interface<\/code> named <code>&lt;Component&gt;Props<\/code>; no prop spreading of unknown props onto DOM elements.<\/p>",
+     "text": "Props typed with a `type`/`interface` named `<Component>Props`; no prop spreading of unknown props onto DOM elements."
+    },
+    {
+     "id": "RE-12",
+     "level": "SHOULD",
+     "category": "Components",
+     "html": "<p>Keep components small (&lt; ~150 lines); extract logic into hooks and pure functions in <code>model/<\/code>; composition (children/slots) over configuration flags.<\/p>",
+     "text": "Keep components small (< ~150 lines); extract logic into hooks and pure functions in `model/`; composition (children/slots) over configuration flags."
+    },
+    {
+     "id": "RE-13",
+     "level": "MUST",
+     "category": "Components",
+     "html": "<p>Stable, unique <code>key<\/code>s from data ids — never array indexes for dynamic lists.<\/p>",
+     "text": "Stable, unique `key`s from data ids — never array indexes for dynamic lists."
+    },
+    {
+     "id": "RE-14",
+     "level": "MUST",
+     "category": "Components",
+     "html": "<p>Route-level and feature-level <strong>error boundaries<\/strong>; <code>Suspense<\/code> boundaries with meaningful fallbacks.<\/p>",
+     "text": "Route-level and feature-level **error boundaries**; `Suspense` boundaries with meaningful fallbacks."
+    },
+    {
+     "id": "RE-20",
+     "level": "MUST",
+     "category": "Hooks & effects",
+     "html": "<p>Follow the Rules of Hooks (enforced by lint); custom hooks start with <code>use<\/code>.<\/p>",
+     "text": "Follow the Rules of Hooks (enforced by lint); custom hooks start with `use`."
+    },
+    {
+     "id": "RE-21",
+     "level": "MUST",
+     "category": "Hooks & effects",
+     "html": "<p><code>useEffect<\/code> only to synchronise with external systems (subscriptions, DOM APIs, non-React widgets). Don&#x27;t use effects to derive state, handle events, or fetch data that a data library should own.<\/p>",
+     "text": "`useEffect` only to synchronise with external systems (subscriptions, DOM APIs, non-React widgets). Don't use effects to derive state, handle events, or fetch data that a data library should own."
+    },
+    {
+     "id": "RE-22",
+     "level": "SHOULD",
+     "category": "Hooks & effects",
+     "html": "<p>Don&#x27;t add <code>useMemo<\/code>/<code>useCallback<\/code> by default — only for measured performance issues or referential stability required by a dependency (or let the React Compiler handle memoisation if adopted by ADR).<\/p>",
+     "text": "Don't add `useMemo`/`useCallback` by default — only for measured performance issues or referential stability required by a dependency (or let the React Compiler handle memoisation if adopted by ADR)."
+    },
+    {
+     "id": "RE-30",
+     "level": "MUST",
+     "category": "State & data",
+     "html": "<p>Server state via a data-fetching library (TanStack Query or framework loaders); query keys defined per feature in one place; mutations invalidate affected queries.<\/p>",
+     "text": "Server state via a data-fetching library (TanStack Query or framework loaders); query keys defined per feature in one place; mutations invalidate affected queries."
+    },
+    {
+     "id": "RE-31",
+     "level": "MUST",
+     "category": "State & data",
+     "html": "<p>URL state (filters, sort, pagination, tabs) lives in the router&#x27;s search params.<\/p>",
+     "text": "URL state (filters, sort, pagination, tabs) lives in the router's search params."
+    },
+    {
+     "id": "RE-32",
+     "level": "SHOULD",
+     "category": "State & data",
+     "html": "<p>Local state with <code>useState<\/code>/<code>useReducer<\/code>; Context only for low-frequency, app-wide values (theme, auth user); a small store (e.g. Zustand) only when an ADR justifies shared client state.<\/p>",
+     "text": "Local state with `useState`/`useReducer`; Context only for low-frequency, app-wide values (theme, auth user); a small store (e.g. Zustand) only when an ADR justifies shared client state."
+    },
+    {
+     "id": "RE-33",
+     "level": "MUST",
+     "category": "State & data",
+     "html": "<p>API responses validated at the boundary (Zod or generated types from OpenAPI) — never trust <code>as SomeType<\/code> casts of network data.<\/p>",
+     "text": "API responses validated at the boundary (Zod or generated types from OpenAPI) — never trust `as SomeType` casts of network data."
+    },
+    {
+     "id": "RE-40",
+     "level": "SHOULD",
+     "category": "Forms",
+     "html": "<p>React Hook Form (or framework form actions) + a Zod schema shared with the API types where possible; field errors rendered next to fields with <code>aria-describedby<\/code>.<\/p>",
+     "text": "React Hook Form (or framework form actions) + a Zod schema shared with the API types where possible; field errors rendered next to fields with `aria-describedby`."
+    },
+    {
+     "id": "RE-50",
+     "level": "MUST",
+     "category": "Styling",
+     "html": "<p>One styling approach per project, chosen by ADR (CSS Modules, Tailwind, or the design system&#x27;s solution). No inline <code>style<\/code> for static styling.<\/p>",
+     "text": "One styling approach per project, chosen by ADR (CSS Modules, Tailwind, or the design system's solution). No inline `style` for static styling."
+    },
+    {
+     "id": "RE-51",
+     "level": "MUST",
+     "category": "Styling",
+     "html": "<p>Use design tokens / theme variables; support the required colour modes.<\/p>",
+     "text": "Use design tokens / theme variables; support the required colour modes."
+    },
+    {
+     "id": "RE-60",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>No <code>dangerouslySetInnerHTML<\/code> without sanitising (DOMPurify) and a comment; validate URLs before using them in <code>href<\/code>/<code>src<\/code> (block <code>javascript:<\/code>).<\/p>",
+     "text": "No `dangerouslySetInnerHTML` without sanitising (DOMPurify) and a comment; validate URLs before using them in `href`/`src` (block `javascript:`)."
+    },
+    {
+     "id": "RE-61",
+     "level": "MUST",
+     "category": "Security",
+     "html": "<p>Only <code>VITE_*<\/code>/public env vars reach the client — treat them as public.<\/p>",
+     "text": "Only `VITE_*`/public env vars reach the client — treat them as public."
+    },
+    {
+     "id": "RE-70",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>Vitest + React Testing Library for components/hooks; Playwright for end-to-end acceptance tests. Query by role/label (<code>getByRole(&#x27;button&#x27;, { name: /submit/i })<\/code>).<\/p>",
+     "text": "Vitest + React Testing Library for components/hooks; Playwright for end-to-end acceptance tests. Query by role/label (`getByRole('button', { name: /submit/i })`)."
+    },
+    {
+     "id": "RE-71",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>AC id in the test name so it reaches JUnit results:<\/p>\n<pre><code class=\"lang-tsx\">describe(&quot;Invoice intake&quot;, () =&gt; {\n  it(&quot;AC-002 rejects an invoice with zero amount&quot;, async () =&gt; {\n    const user = userEvent.setup();\n    render(&lt;InvoiceForm /&gt;);\n    await user.type(screen.getByLabelText(/amount/i), &quot;0&quot;);\n    await user.click(screen.getByRole(&quot;button&quot;, { name: /submit/i }));\n    expect(await screen.findByText(/amount must be greater than zero/i)).toBeInTheDocument();\n  });\n});<\/code><\/pre>",
+     "text": "AC id in the test name so it reaches JUnit results: ```tsx describe(\"Invoice intake\", () => { it(\"AC-002 rejects an invoice with zero amount\", async () => { const user = userEvent.setup(); render(<InvoiceForm />); await user.type(screen.getByLabelText(/amount/i), \"0\"); await user.click(screen.getByRole(\"button\", { name: /submit/i })); expect(await screen.findByText(/amount must be greater than zero/i)).toBeInTheDocument(); }); }); ```"
+    },
+    {
+     "id": "RE-72",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>JUnit output: <code>vitest run --reporter=default --reporter=junit --outputFile.junit=reports/junit-unit.xml<\/code>; Playwright <code>reporter: [[&#x27;junit&#x27;, { outputFile: &#x27;reports/junit-e2e.xml&#x27; }]]<\/code>.<\/p>",
+     "text": "JUnit output: `vitest run --reporter=default --reporter=junit --outputFile.junit=reports/junit-unit.xml`; Playwright `reporter: [['junit', { outputFile: 'reports/junit-e2e.xml' }]]`."
+    },
+    {
+     "id": "RE-73",
+     "level": "SHOULD",
+     "category": "Testing",
+     "html": "<p>Mock HTTP with MSW; no mocking of React, hooks or your own modules to reach internals. Include an axe check for key pages.<\/p>",
+     "text": "Mock HTTP with MSW; no mocking of React, hooks or your own modules to reach internals. Include an axe check for key pages."
+    }
+   ]
+  },
+  {
+   "key": "PYTHON",
+   "label": "Python",
+   "description": "Python coding standards — typing, project layout, style, errors, async, FastAPI/Django, data access, logging, tooling (uv, ruff, mypy) and pytest with AC traceability.",
+   "appliesTo": "**/*.py, **/pyproject.toml",
+   "introHtml": "<p>Baseline: <strong>a currently supported CPython<\/strong> (pinned in <code>.python-version<\/code> and <code>requires-python<\/code>), managed with <strong>uv<\/strong>. Builds on <span class=\"ref\" title=\"GENERAL.md\">GENERAL.md<\/span> and <span class=\"ref\" title=\"BACKEND.md\">BACKEND.md<\/span>. Starter config: <span class=\"ref\" title=\"../../templates/stacks/python/\"><code>templates/stacks/python/<\/code><\/span>.<\/p>",
+   "rules": [
+    {
+     "id": "PY-01",
+     "level": "MUST",
+     "category": "Project setup",
+     "html": "<p><code>pyproject.toml<\/code> is the single config file; dependencies managed with <code>uv<\/code>, <code>uv.lock<\/code> committed; dev tools in a <code>dev<\/code> dependency group.<\/p>",
+     "text": "`pyproject.toml` is the single config file; dependencies managed with `uv`, `uv.lock` committed; dev tools in a `dev` dependency group."
+    },
+    {
+     "id": "PY-02",
+     "level": "MUST",
+     "category": "Project setup",
+     "html": "<p><code>src/<\/code> layout:<\/p>\n<pre><code>src/&lt;package&gt;/\n  api/            HTTP layer (routers, request/response schemas)\n  domain/         entities, value objects, services — no framework/DB imports\n  adapters/       repositories, external clients, messaging\n  config.py       settings (pydantic-settings)\n  main.py         app factory / entry point\ntests/unit/  tests/integration/  tests/acceptance/<\/code><\/pre>",
+     "text": "`src/` layout: ``` src/<package>/ api/ HTTP layer (routers, request/response schemas) domain/ entities, value objects, services — no framework/DB imports adapters/ repositories, external clients, messaging config.py settings (pydantic-settings) main.py app factory / entry point tests/unit/ tests/integration/ tests/acceptance/ ```"
+    },
+    {
+     "id": "PY-03",
+     "level": "MUST",
+     "category": "Project setup",
+     "html": "<p><strong>ruff<\/strong> for lint <em>and<\/em> format (<code>ruff check<\/code>, <code>ruff format --check<\/code>); <strong>mypy --strict<\/strong> (or pyright strict) on <code>src/<\/code>. All three run in <code>make lint<\/code>.<\/p>",
+     "text": "**ruff** for lint *and* format (`ruff check`, `ruff format --check`); **mypy --strict** (or pyright strict) on `src/`. All three run in `make lint`."
+    },
+    {
+     "id": "PY-10",
+     "level": "MUST",
+     "category": "Style & naming",
+     "html": "<p>PEP 8 naming: <code>snake_case<\/code> functions/variables/modules, <code>PascalCase<\/code> classes, <code>UPPER_SNAKE<\/code> constants, <code>_leading_underscore<\/code> for internal names.<\/p>",
+     "text": "PEP 8 naming: `snake_case` functions/variables/modules, `PascalCase` classes, `UPPER_SNAKE` constants, `_leading_underscore` for internal names."
+    },
+    {
+     "id": "PY-11",
+     "level": "MUST",
+     "category": "Style & naming",
+     "html": "<p>Absolute imports from the package root; no wildcard imports; no circular imports.<\/p>",
+     "text": "Absolute imports from the package root; no wildcard imports; no circular imports."
+    },
+    {
+     "id": "PY-12",
+     "level": "SHOULD",
+     "category": "Style & naming",
+     "html": "<p>f-strings for formatting (but not in logging calls — see PY-61); <code>pathlib.Path<\/code> over <code>os.path<\/code>; comprehensions over <code>map<\/code>/<code>filter<\/code> with lambdas.<\/p>",
+     "text": "f-strings for formatting (but not in logging calls — see PY-61); `pathlib.Path` over `os.path`; comprehensions over `map`/`filter` with lambdas."
+    },
+    {
+     "id": "PY-13",
+     "level": "MUST",
+     "category": "Style & naming",
+     "html": "<p>No mutable default arguments; no module-level side effects on import (I/O, network, DB connections).<\/p>",
+     "text": "No mutable default arguments; no module-level side effects on import (I/O, network, DB connections)."
+    },
+    {
+     "id": "PY-20",
+     "level": "MUST",
+     "category": "Typing",
+     "html": "<p>Type hints on all function signatures and class attributes in <code>src/<\/code>; modern syntax (<code>list[str]<\/code>, <code>X | None<\/code>, <code>type<\/code> aliases).<\/p>",
+     "text": "Type hints on all function signatures and class attributes in `src/`; modern syntax (`list[str]`, `X | None`, `type` aliases)."
+    },
+    {
+     "id": "PY-21",
+     "level": "MUST",
+     "category": "Typing",
+     "html": "<p>No <code>Any<\/code> in public signatures without a comment; <code>cast()<\/code> and <code># type: ignore[code]<\/code> need a reason.<\/p>",
+     "text": "No `Any` in public signatures without a comment; `cast()` and `# type: ignore[code]` need a reason."
+    },
+    {
+     "id": "PY-22",
+     "level": "SHOULD",
+     "category": "Typing",
+     "html": "<p><code>@dataclass(frozen=True, slots=True)<\/code> for domain value objects; Pydantic models at I/O boundaries (API, config, external payloads) — don&#x27;t leak them into the domain.<\/p>",
+     "text": "`@dataclass(frozen=True, slots=True)` for domain value objects; Pydantic models at I/O boundaries (API, config, external payloads) — don't leak them into the domain."
+    },
+    {
+     "id": "PY-23",
+     "level": "MUST",
+     "category": "Typing",
+     "html": "<p><code>Decimal<\/code> for money; timezone-aware <code>datetime<\/code> in UTC (<code>datetime.now(UTC)<\/code>) and an injectable clock for logic.<\/p>",
+     "text": "`Decimal` for money; timezone-aware `datetime` in UTC (`datetime.now(UTC)`) and an injectable clock for logic."
+    },
+    {
+     "id": "PY-30",
+     "level": "MUST",
+     "category": "Errors",
+     "html": "<p>A package exception hierarchy (<code>class InvoiceError(AppError)<\/code>); raise specific exceptions; <code>raise ... from err<\/code> to keep the cause.<\/p>",
+     "text": "A package exception hierarchy (`class InvoiceError(AppError)`); raise specific exceptions; `raise ... from err` to keep the cause."
+    },
+    {
+     "id": "PY-31",
+     "level": "MUST",
+     "category": "Errors",
+     "html": "<p>No bare <code>except:<\/code> and no <code>except Exception:<\/code> except at boundaries, where it is logged with <code>logger.exception<\/code> and translated.<\/p>",
+     "text": "No bare `except:` and no `except Exception:` except at boundaries, where it is logged with `logger.exception` and translated."
+    },
+    {
+     "id": "PY-32",
+     "level": "SHOULD",
+     "category": "Errors",
+     "html": "<p>Use context managers for resources (files, connections, locks).<\/p>",
+     "text": "Use context managers for resources (files, connections, locks)."
+    },
+    {
+     "id": "PY-40",
+     "level": "MUST",
+     "category": "Async",
+     "html": "<p>In async code never call blocking I/O (<code>requests<\/code>, sync DB drivers, <code>time.sleep<\/code>); use async clients (<code>httpx.AsyncClient<\/code>) or <code>asyncio.to_thread<\/code>.<\/p>",
+     "text": "In async code never call blocking I/O (`requests`, sync DB drivers, `time.sleep`); use async clients (`httpx.AsyncClient`) or `asyncio.to_thread`."
+    },
+    {
+     "id": "PY-41",
+     "level": "MUST",
+     "category": "Async",
+     "html": "<p>Every outbound HTTP call has an explicit timeout; clients are created once and reused (lifespan), not per request.<\/p>",
+     "text": "Every outbound HTTP call has an explicit timeout; clients are created once and reused (lifespan), not per request."
+    },
+    {
+     "id": "PY-42",
+     "level": "SHOULD",
+     "category": "Async",
+     "html": "<p>Structured concurrency with <code>asyncio.TaskGroup<\/code>; no fire-and-forget tasks without a reference and error handling.<\/p>",
+     "text": "Structured concurrency with `asyncio.TaskGroup`; no fire-and-forget tasks without a reference and error handling."
+    },
+    {
+     "id": "PY-50",
+     "level": "SHOULD",
+     "category": "Web frameworks",
+     "html": "<p>FastAPI for APIs (Django when an admin/CMS-heavy app is chosen by ADR).<\/p>",
+     "text": "FastAPI for APIs (Django when an admin/CMS-heavy app is chosen by ADR)."
+    },
+    {
+     "id": "PY-51",
+     "level": "MUST",
+     "category": "Web frameworks",
+     "html": "<p>FastAPI: routers per feature; request/response models declared (<code>response_model<\/code>); dependencies via <code>Depends<\/code> for DB sessions, auth and settings; exception handlers produce RFC 9457 Problem Details.<\/p>",
+     "text": "FastAPI: routers per feature; request/response models declared (`response_model`); dependencies via `Depends` for DB sessions, auth and settings; exception handlers produce RFC 9457 Problem Details."
+    },
+    {
+     "id": "PY-52",
+     "level": "MUST",
+     "category": "Web frameworks",
+     "html": "<p>Settings via <code>pydantic-settings<\/code>, validated at start-up; no <code>os.environ[...]<\/code> scattered in code.<\/p>",
+     "text": "Settings via `pydantic-settings`, validated at start-up; no `os.environ[...]` scattered in code."
+    },
+    {
+     "id": "PY-53",
+     "level": "MUST",
+     "category": "Web frameworks",
+     "html": "<p>Data access with SQLAlchemy 2.x (typed <code>Mapped[...]<\/code>, <code>select()<\/code> style) or the Django ORM; migrations with Alembic / Django migrations; never f-string SQL.<\/p>",
+     "text": "Data access with SQLAlchemy 2.x (typed `Mapped[...]`, `select()` style) or the Django ORM; migrations with Alembic / Django migrations; never f-string SQL."
+    },
+    {
+     "id": "PY-60",
+     "level": "MUST",
+     "category": "Logging",
+     "html": "<p><code>logger = logging.getLogger(__name__)<\/code> per module (or structlog); JSON output in deployed environments with trace/correlation id.<\/p>",
+     "text": "`logger = logging.getLogger(__name__)` per module (or structlog); JSON output in deployed environments with trace/correlation id."
+    },
+    {
+     "id": "PY-61",
+     "level": "MUST",
+     "category": "Logging",
+     "html": "<p>Lazy formatting: <code>logger.info(&quot;Invoice %s rejected&quot;, invoice_id)<\/code> — not f-strings; no <code>print()<\/code> in <code>src/<\/code>. No PII/secrets in logs.<\/p>",
+     "text": "Lazy formatting: `logger.info(\"Invoice %s rejected\", invoice_id)` — not f-strings; no `print()` in `src/`. No PII/secrets in logs."
+    },
+    {
+     "id": "PY-70",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>pytest; fixtures in <code>conftest.py<\/code> (mark helper-only files with <code># adlc: no-trace<\/code> if they contain no tests); <code>pytest-asyncio<\/code> (or anyio) for async tests.<\/p>",
+     "text": "pytest; fixtures in `conftest.py` (mark helper-only files with `# adlc: no-trace` if they contain no tests); `pytest-asyncio` (or anyio) for async tests."
+    },
+    {
+     "id": "PY-71",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>AC id in the test function name so it reaches JUnit results:<\/p>\n<pre><code class=\"lang-python\">def test_AC_002_zero_amount_is_rejected(client: TestClient) -&gt; None:\n    # Arrange\n    payload = make_invoice(amount=Decimal(&quot;0.00&quot;))\n    # Act\n    response = client.post(&quot;/v1/invoices&quot;, json=payload)\n    # Assert\n    assert response.status_code == 422\n    assert response.json()[&quot;code&quot;] == &quot;AMOUNT_ZERO&quot;<\/code><\/pre>",
+     "text": "AC id in the test function name so it reaches JUnit results: ```python def test_AC_002_zero_amount_is_rejected(client: TestClient) -> None: # Arrange payload = make_invoice(amount=Decimal(\"0.00\")) # Act response = client.post(\"/v1/invoices\", json=payload) # Assert assert response.status_code == 422 assert response.json()[\"code\"] == \"AMOUNT_ZERO\" ```"
+    },
+    {
+     "id": "PY-72",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>JUnit output: <code>pytest --junitxml=reports/junit.xml<\/code>; coverage with <code>pytest-cov<\/code> and the threshold from TEST-PLAN (<code>--cov-fail-under<\/code>).<\/p>",
+     "text": "JUnit output: `pytest --junitxml=reports/junit.xml`; coverage with `pytest-cov` and the threshold from TEST-PLAN (`--cov-fail-under`)."
+    },
+    {
+     "id": "PY-73",
+     "level": "MUST",
+     "category": "Testing",
+     "html": "<p>Integration tests against real dependencies (Testcontainers / docker compose); <code>respx<\/code>/<code>pytest-httpx<\/code> for outbound HTTP; no patching of your own domain functions.<\/p>",
+     "text": "Integration tests against real dependencies (Testcontainers / docker compose); `respx`/`pytest-httpx` for outbound HTTP; no patching of your own domain functions."
+    },
+    {
+     "id": "PY-74",
+     "level": "SHOULD",
+     "category": "Testing",
+     "html": "<p>Property-based tests (Hypothesis) for parsing, money and date logic.<\/p>",
+     "text": "Property-based tests (Hypothesis) for parsing, money and date logic."
+    }
+   ]
+  }
+ ],
+ "precedenceHtml": "<ol><li>An accepted <strong>ADR<\/strong>.<\/li><li>The repository <strong><code>.editorconfig<\/code><\/strong> — for <strong>style and formatting<\/strong> rules only (naming, braces, <code>var<\/code>, usings, indentation, analyzer severities). It is the executable form of those rules; the build already enforces it.<\/li><li>The stack standard (DOTNET / BLAZOR / REACT / PYTHON).<\/li><li>FRONTEND / BACKEND.<\/li><li>GENERAL.<\/li><\/ol>\n<p><code>.editorconfig<\/code> cannot relax a behavioural <strong>MUST<\/strong> (nullability, async, security, error handling, testing, traceability) — that still needs an ADR. A conflict between <code>.editorconfig<\/code> and a standard is a defect: fix whichever is wrong in the same PR (and write an ADR if the deviation is deliberate). To deviate from a <strong>MUST<\/strong>, write an ADR. A <strong>SHOULD<\/strong> may be skipped with a one-line reason in the PR.<\/p>"
+}</script>
+<script>
+(function () {
+  "use strict";
+
+  var DATA = JSON.parse(document.getElementById("governance-data").textContent);
+  var LEVEL_LABELS = { automated: "Automated", checked: "Gate-checked", review: "Review", process: "Process" };
+  var THEME_KEY = "adlc-governance-theme";
+
+  function el(tag, attrs, children) {
+    var node = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (key) {
+      var value = attrs[key];
+      if (value === null || value === undefined) return;
+      if (key === "html") node.innerHTML = value;
+      else if (key === "text") node.textContent = value;
+      else if (key.slice(0, 2) === "on") node.addEventListener(key.slice(2), value);
+      else node.setAttribute(key, value);
+    });
+    (children || []).forEach(function (child) { if (child) node.appendChild(child); });
+    return node;
+  }
+
+  /* ---------- theme & portal link ---------- */
+  var root = document.documentElement;
+  try { var stored = localStorage.getItem(THEME_KEY); if (stored === "light" || stored === "dark") root.setAttribute("data-theme", stored); } catch (e) { /* storage unavailable */ }
+  document.getElementById("theme-toggle").addEventListener("click", function () {
+    var current = root.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    var next = current === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* storage unavailable */ }
+  });
+  if (/^https?:$/.test(location.protocol) && /\/[^/]+\/(index\.html)?$/.test(location.pathname)) {
+    document.getElementById("portal-link").hidden = false;
+  }
+
+  /* ---------- header ---------- */
+  var allRules = [];
+  DATA.standards.forEach(function (standard) {
+    standard.rules.forEach(function (rule) { rule.standard = standard.key; allRules.push(rule); });
+  });
+  var mustCount = allRules.filter(function (r) { return r.level === "MUST"; }).length;
+  document.getElementById("intro").innerHTML = DATA.introHtml;
+  document.getElementById("precedence").innerHTML = DATA.precedenceHtml;
+  var stats = document.getElementById("stats");
+  [[DATA.controls.length, "controls"], [allRules.length, "coding rules"], [mustCount, "MUST rules"],
+   [DATA.standards.length, "standards"]].forEach(function (pair) {
+    stats.appendChild(el("span", { "class": "stat" }, [el("b", { text: String(pair[0]) }), document.createTextNode(" " + pair[1])]));
+  });
+
+  /* ---------- controls ---------- */
+  var grid = document.getElementById("control-grid");
+  DATA.controls.forEach(function (control) {
+    grid.appendChild(el("article", { "class": "control" }, [
+      el("h3", { text: control.title }),
+      el("div", { "class": "badges" }, control.levels.map(function (level) {
+        return el("span", { "class": "badge lv-" + level, text: LEVEL_LABELS[level] });
+      })),
+      el("p", { "class": "guarantee", html: control.guaranteeHtml }),
+      el("h4", { text: "How it's enforced" }), el("p", { html: control.howHtml }),
+      el("h4", { text: "Evidence" }), el("p", { html: control.evidenceHtml }),
+      control.rules.length ? el("div", { "class": "rule-links" }, control.rules.map(function (id) {
+        return el("button", { "class": "rule-link", type: "button", text: id, title: "Show " + id + " in the standards",
+          onclick: function () { showRule(id); } });
+      })) : null
+    ]));
+  });
+
+  /* ---------- standards browser ---------- */
+  var state = { standard: "all", level: "all", query: "" };
+
+  function chipBar(container, options, key) {
+    options.forEach(function (option) {
+      container.appendChild(el("button", {
+        "class": "chip", type: "button", "data-value": option.value, "aria-pressed": String(state[key] === option.value),
+        onclick: function () { state[key] = option.value; render(); }
+      }, [document.createTextNode(option.label), option.count !== undefined ? el("span", { "class": "count", text: String(option.count) }) : null]));
+    });
+  }
+  chipBar(document.getElementById("standard-filters"),
+    [{ value: "all", label: "All standards", count: allRules.length }].concat(DATA.standards.map(function (s) {
+      return { value: s.key, label: s.label, count: s.rules.length };
+    })), "standard");
+  chipBar(document.getElementById("level-filters"),
+    [{ value: "all", label: "All levels" }, { value: "MUST", label: "MUST", count: mustCount },
+     { value: "SHOULD", label: "SHOULD", count: allRules.length - mustCount }], "level");
+
+  function matches(rule) {
+    if (state.standard !== "all" && rule.standard !== state.standard) return false;
+    if (state.level !== "all" && rule.level !== state.level) return false;
+    if (!state.query) return true;
+    return (rule.id + " " + rule.category + " " + rule.text).toLowerCase().indexOf(state.query) !== -1;
+  }
+
+  function render() {
+    document.querySelectorAll("#standard-filters .chip").forEach(function (chip) {
+      chip.setAttribute("aria-pressed", String(chip.dataset.value === state.standard));
+    });
+    document.querySelectorAll("#level-filters .chip").forEach(function (chip) {
+      chip.setAttribute("aria-pressed", String(chip.dataset.value === state.level));
+    });
+    var list = document.getElementById("rule-list");
+    var shown = 0;
+    var blocks = [];
+    DATA.standards.forEach(function (standard) {
+      var rules = standard.rules.filter(matches);
+      if (!rules.length) return;
+      shown += rules.length;
+      var categories = [];
+      var current = null;
+      rules.forEach(function (rule) {
+        if (!current || current.name !== rule.category) { current = { name: rule.category, rules: [] }; categories.push(current); }
+        current.rules.push(rule);
+      });
+      blocks.push(el("div", { "class": "standard" }, [
+        el("div", { "class": "standard-head" }, [
+          el("h3", { text: standard.label }),
+          el("p", { text: standard.description })
+        ])
+      ].concat(categories.map(function (category) {
+        return el("div", { "class": "category" }, [el("h4", { text: category.name })].concat(category.rules.map(function (rule) {
+          return el("div", { "class": "rule", id: "rule-" + rule.id }, [
+            el("span", { "class": "rule-id", text: rule.id }),
+            el("span", {}, [el("span", { "class": "badge lvl-" + rule.level, text: rule.level })]),
+            el("div", { "class": "rule-body", html: rule.html })
+          ]);
+        })));
+      }))));
+    });
+    list.replaceChildren.apply(list, blocks.length ? blocks : [el("div", { "class": "empty", text: "No rules match these filters." })]);
+    document.getElementById("result-count").textContent =
+      shown === allRules.length ? "Showing all " + shown + " rules" : "Showing " + shown + " of " + allRules.length + " rules";
+  }
+
+  document.getElementById("search").addEventListener("input", function (event) {
+    state.query = event.target.value.trim().toLowerCase();
+    render();
+  });
+
+  function showRule(id) {
+    state = { standard: "all", level: "all", query: "" };
+    document.getElementById("search").value = "";
+    render();
+    var node = document.getElementById("rule-" + id);
+    if (!node) return;
+    node.scrollIntoView({ block: "center" });
+    node.classList.add("flash");
+    setTimeout(function () { node.classList.remove("flash"); }, 1600);
+    history.replaceState(null, "", "#rule-" + id);
+  }
+
+  render();
+  var hash = location.hash.slice(1);
+  if (hash.indexOf("rule-") === 0) showRule(hash.slice(5));
+})();
+</script>
+</body>
+</html>
