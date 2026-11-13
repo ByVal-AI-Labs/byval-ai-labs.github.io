@@ -1,8 +1,9 @@
-# ADLC Portal
+# Workbench
 
-**https://byval-ai-labs.github.io/adlc-portal/**
+**https://byval-ai-labs.github.io/**
 
-The ADLC guide and ByVal AI Labs capabilities in one place, for stakeholders.
+Workbench by ByVal AI Labs: the process we follow, real apps built with it, and the tools, skills
+and capabilities behind them, in one place for stakeholders.
 
 This repository is **public**, and so is everything in it. Each section is built in its own
 (usually private) source repository and pushed here as finished pages only, never as source code.
@@ -60,8 +61,8 @@ metrics/
 | `title` | yes | Card heading |
 | `description` | yes | One or two sentences |
 | `owner` | no | Team or person shown on the card. Don't name private repositories. |
-| `category` | no | Groups cards under a heading (default `General`) |
-| `order` | no | Integer; lower comes first, both for categories and for cards within one (default `100`) |
+| `category` | no | Groups cards under a heading: `Process`, `Stories`, `Tools`, `Skills` or `Capabilities` (default `General`) |
+| `order` | no | Integer; lower comes first, both for categories and for cards within one (default `100`). Suggested bands: Process 10–19, Stories 20–29, Tools 30–39, Skills 40–49, Capabilities 50–59 |
 | `updated` | no | ISO 8601 timestamp, normally set by the publishing workflow |
 
 Folder names use lowercase letters, digits and hyphens. A link back to the portal from your page
@@ -73,7 +74,7 @@ Each source repository gets its own SSH deploy key:
 
 1. Generate a key pair locally: `ssh-keygen -t ed25519 -N "" -f key`.
 2. Add `key.pub` to **this** repository as a deploy key with write access:
-   `gh repo deploy-key add key.pub --repo ByVal-AI-Labs/adlc-portal --allow-write --title "<source repo> publish"`.
+   `gh repo deploy-key add key.pub --repo ByVal-AI-Labs/byval-ai-labs.github.io --allow-write --title "<source repo> publish"`.
 3. Store the private half `key` as a secret in the **source** repository:
    `gh secret set PORTAL_DEPLOY_KEY --repo <owner>/<source repo> < key`.
 4. Delete both local key files.

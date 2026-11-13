@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Assemble the ADLC Portal site.
+"""Assemble the Workbench site.
 
 Every top-level folder with a meta.json and an index.html is a *section*, published by one source
 repository. This script validates each section, renders the landing page from

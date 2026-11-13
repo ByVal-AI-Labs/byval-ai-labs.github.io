@@ -4,8 +4,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ADLC Portal</title>
-<meta name="description" content="The ADLC guide and ByVal AI Labs capabilities in one place.">
+<title>Workbench · ByVal AI Labs</title>
+<meta name="description" content="Workbench by ByVal AI Labs: how we build with AI, real apps built that way, and the tools, skills and capabilities behind them.">
 <style>
   :root {
     --bg: #f6f6f3; --surface: #ffffff; --surface-2: #efefea; --text: #1c1c1a; --muted: #5d5d57;
@@ -68,12 +68,12 @@
     <div class="top">
       <div>
         <p class="eyebrow">ByVal AI Labs</p>
-        <h1>ADLC Portal</h1>
+        <h1>Workbench</h1>
       </div>
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle colour theme">◐ Theme</button>
     </div>
-    <p class="lede">How we build software with AI-assisted development, and what we've built with it. One place for the
-      process, the tooling and the capabilities behind them.</p>
+    <p class="lede">Where ByVal AI Labs keeps its craft: the process we follow, real apps built with it, and the
+      tools, skills and capabilities behind them.</p>
     <span class="count"><!--PORTAL_COUNT--></span>
   </div>
 </header>
@@ -85,14 +85,14 @@
 <footer>
   <div class="wrap">
     Each section is published by its own repository.
-    <a href="https://github.com/ByVal-AI-Labs/adlc-portal#add-a-section">Add a section</a>.
+    <a href="https://github.com/ByVal-AI-Labs/byval-ai-labs.github.io#add-a-section">Add a section</a>.
   </div>
 </footer>
 
 <script>
 (function () {
   "use strict";
-  var KEY = "adlc-portal-theme";
+  var KEY = "workbench-theme";
   var root = document.documentElement;
   try { var stored = localStorage.getItem(KEY); if (stored === "light" || stored === "dark") root.setAttribute("data-theme", stored); } catch (e) { /* storage unavailable */ }
   document.getElementById("theme-toggle").addEventListener("click", function () {
