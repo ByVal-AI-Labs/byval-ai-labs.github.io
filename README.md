@@ -28,6 +28,7 @@ private repo C ──push built pages──▶ showcase/   ┘    (landing page 
 | Folder | Published by | Workflow |
 |---|---|---|
 | `guide/` | ADLC template repository | `.github/workflows/guide-pages.yml` |
+| `governance/` | ADLC template repository | `.github/workflows/guide-pages.yml` |
 
 ## Add a section
 
@@ -81,10 +82,19 @@ A deploy key can write to the whole repository. Each source repository should to
 folder, and the publishing workflow below does exactly that. With many source repositories, switch
 to a single GitHub App whose credentials are shared as organisation secrets.
 
-### 3. Publishing workflow (in the source repository)
+### 3. Before you publish
 
-Copy `.github/workflows/guide-pages.yml` from the ADLC template and change the `env` block:
-`PORTAL_SECTION` (your folder), `SECTION_BUILD` (the command that builds your pages) and
-`SECTION_DIR` (where they end up). It replaces your folder in this repository on every run, writes
+The portal is public. Before a section goes live, confirm that it contains:
+
+- no client names, logos, data, or screenshots of client systems;
+- no names of private repositories, internal hostnames or credentials;
+- metrics only from internal or reference projects (client aggregates need the client's permission);
+- only claims that are true today. Mark aspirations as such.
+
+### 4. Publishing workflow (in the source repository)
+
+Copy `.github/workflows/guide-pages.yml` from the ADLC template and change its `matrix` entries
+(`section`, `build`, `page`, `meta`). Run it manually with `dry_run` first. That builds the pages and
+checks push access without publishing anything. It replaces your folder in this repository on every run, writes
 `updated` into your `meta.json`, and retries the push if another section published at the same
 moment.
