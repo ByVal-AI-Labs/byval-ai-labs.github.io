@@ -1,0 +1,48 @@
+name: Deploy portal
+
+# Rebuilds the landing page from every section's meta.json and deploys the site to GitHub Pages.
+# Runs whenever a source repository pushes its section (deploy-key pushes trigger workflows).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true   # only the newest state of main matters
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5   # build_portal.py is stdlib only
+        with:
+          python-version: "3.12"
+
+      - name: Assemble the site
+        run: python3 _portal/build_portal.py --out _site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
