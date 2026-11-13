@@ -1,0 +1,891 @@
+<!doctype html>
+<!--
+  Source template for the ADLC guide. Edit this file (layout, styles, behaviour), then run
+  `make guide` — build_guide.py injects the ADLC content and writes index.html.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADLC Guide</title>
+<style>
+  :root {
+    --bg: #f6f6f3;
+    --surface: #ffffff;
+    --surface-2: #efefea;
+    --text: #1c1c1a;
+    --muted: #5d5d57;
+    --border: #dfdfd8;
+    --accent: #2b55c9;
+    --accent-soft: #e7edfb;
+    --accent-text: #ffffff;
+    --gate: #1d7149;
+    --gate-soft: #e3f2e9;
+    --role: #8a4b0f;
+    --role-soft: #f8ecdf;
+    --helper: #5b3fa6;
+    --helper-soft: #eee9fa;
+    --code-bg: #f1f1ec;
+    --shadow: 0 1px 2px rgba(20, 20, 15, .06), 0 4px 16px rgba(20, 20, 15, .05);
+    --radius: 12px;
+    --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121315; --surface: #1a1b1e; --surface-2: #232428; --text: #ebebe7; --muted: #a2a29c;
+      --border: #303136; --accent: #7d9bff; --accent-soft: #1e2744; --accent-text: #0e1120;
+      --gate: #63c995; --gate-soft: #16301f; --role: #f0a964; --role-soft: #35240f;
+      --helper: #b9a2ff; --helper-soft: #2a2242; --code-bg: #24252a;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 16px rgba(0, 0, 0, .25);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121315; --surface: #1a1b1e; --surface-2: #232428; --text: #ebebe7; --muted: #a2a29c;
+    --border: #303136; --accent: #7d9bff; --accent-soft: #1e2744; --accent-text: #0e1120;
+    --gate: #63c995; --gate-soft: #16301f; --role: #f0a964; --role-soft: #35240f;
+    --helper: #b9a2ff; --helper-soft: #2a2242; --code-bg: #24252a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 16px rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 var(--font); }
+  a { color: var(--accent); }
+  code { font: .88em var(--mono); background: var(--code-bg); padding: .1em .35em; border-radius: 5px; }
+  pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+  pre code { background: none; padding: 0; font-size: 13px; }
+  .ref { border-bottom: 1px dotted var(--muted); cursor: help; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+
+  /* header & nav */
+  header.hero { padding: 40px 0 24px; }
+  .hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .eyebrow { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  h1 { margin: 6px 0 12px; font-size: clamp(26px, 4vw, 36px); line-height: 1.2; letter-spacing: -.01em; }
+  .intro { max-width: 760px; color: var(--muted); }
+  .intro p { margin: 0 0 10px; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+  nav.tabs { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+  nav.tabs .wrap { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  nav.tabs a { flex: none; padding: 14px 12px; color: var(--muted); text-decoration: none; font-weight: 500;
+    border-bottom: 2px solid transparent; }
+  nav.tabs a:hover, nav.tabs a.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  section { padding: 40px 0 8px; }
+  h2 { font-size: 24px; margin: 0 0 6px; letter-spacing: -.01em; }
+  .lede { color: var(--muted); margin: 0 0 20px; max-width: 760px; }
+
+  /* lifecycle flow */
+  .flow { display: grid; grid-template-columns: 3fr 4fr; gap: 12px; }
+  .flow-group { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
+  .flow-group > span { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin: 0 4px 10px;
+    text-transform: uppercase; letter-spacing: .06em; }
+  .flow-steps { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
+  .phase-chip { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; text-align: left;
+    padding: 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+    font: inherit; cursor: pointer; transition: border-color .15s, background .15s, transform .15s; min-width: 0; }
+  .phase-chip:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .phase-chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+  .phase-chip .num { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 13px;
+    font-weight: 700; background: var(--surface); border: 1px solid var(--border); }
+  .phase-chip[aria-pressed="true"] .num { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  .phase-chip .label { font-size: 13px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+  .phase-chip:not(:last-child)::after { content: "→"; position: absolute; right: -8px; top: 12px; transform: translateX(50%);
+    color: var(--muted); font-size: 13px; pointer-events: none; }
+  .loops { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 24px; }
+  .loop { display: inline-block; max-width: 100%; line-height: 1.45; font-size: 13px; padding: 4px 10px; border-radius: 999px;
+    background: var(--surface); border: 1px dashed var(--border); color: var(--muted); }
+  .loop b { color: var(--text); font-weight: 600; }
+
+  /* phase detail */
+  .detail { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 24px; }
+  .detail-head { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 20px; }
+  .detail-head .big-num { flex: none; width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center;
+    font-size: 22px; font-weight: 700; background: var(--accent); color: var(--accent-text); }
+  .detail-head h3 { margin: 2px 0 4px; font-size: 22px; }
+  .detail-head .goal { margin: 0; color: var(--muted); }
+  .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .card { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; background: var(--surface); min-width: 0; }
+  .card h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .card p { margin: 0; }
+  .card.gate { background: var(--gate-soft); border-color: color-mix(in srgb, var(--gate) 35%, transparent); }
+  .card.gate h4 { color: var(--gate); }
+  .card.gate pre { margin: 10px 0 0; background: var(--surface); }
+  .commands { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .cmd { border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 8px;
+    padding: 4px 10px; font: 13px var(--mono); cursor: pointer; }
+  .cmd:hover { border-color: var(--accent); color: var(--accent); }
+  .cmd.role { background: var(--role-soft); color: var(--role); border-color: transparent; }
+  .cmd.helper { background: var(--helper-soft); color: var(--helper); border-color: transparent; }
+  details.steps { margin-top: 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  details.steps > summary, details.more > summary { cursor: pointer; font-weight: 600; padding: 12px 16px; list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  details.steps > summary::before, details.more > summary::before { content: "▸"; display: inline-block; width: 1em;
+    transition: transform .15s; color: var(--muted); }
+  details[open].steps > summary::before, details[open].more > summary::before { transform: rotate(90deg); }
+  .md { padding: 0 16px 12px; overflow-wrap: anywhere; }
+  .md h3, .md h4, .md h5 { margin: 18px 0 6px; font-size: 15px; }
+  .md ol, .md ul { padding-left: 22px; }
+  .md li { margin: 4px 0; }
+  .pager { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; }
+  .pager button { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px;
+    padding: 8px 12px; font: inherit; font-size: 14px; cursor: pointer; }
+  .pager button:disabled { opacity: .4; cursor: default; }
+  .pager button:not(:disabled):hover { border-color: var(--accent); }
+
+  /* tables */
+  .table-wrap { overflow-x: auto; margin: 12px 0; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  th { background: var(--surface-2); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  .md th, .md td { overflow-wrap: normal; min-width: 8em; }
+
+  /* skills */
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+  .filter { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px;
+    padding: 6px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .filter[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .filter .count { opacity: .6; margin-left: 4px; }
+  .search { flex: 1 1 220px; min-width: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    border-radius: 999px; padding: 7px 14px; font: inherit; font-size: 14px; }
+  .search:focus, .filter:focus-visible, .phase-chip:focus-visible, .cmd:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .skill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; align-items: start; }
+  .skill { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); transition: box-shadow .3s, border-color .3s; min-width: 0; }
+  .skill.flash { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .skill-body { padding: 16px 16px 4px; }
+  .skill-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .skill-name { font: 600 15px var(--mono); overflow-wrap: anywhere; }
+  .badge { flex: none; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 2px 9px; }
+  .badge.phase { background: var(--accent-soft); color: var(--accent); }
+  .badge.helper { background: var(--helper-soft); color: var(--helper); }
+  .badge.role { background: var(--role-soft); color: var(--role); }
+  .skill-title { margin: 0 0 8px; color: var(--muted); font-size: 13px; }
+  .skill-desc { margin: 0 0 10px; font-size: 14px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .meta button { border: none; background: none; padding: 0; font: inherit; color: var(--accent); cursor: pointer; text-decoration: underline; }
+  details.more { border-top: 1px solid var(--border); }
+  details.more > summary { font-size: 14px; padding: 10px 16px; }
+  .source { font-size: 12px; color: var(--muted); padding: 0 16px 12px; }
+  .empty { color: var(--muted); padding: 24px; text-align: center; border: 1px dashed var(--border); border-radius: var(--radius); }
+
+  /* traceability */
+  .chain { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 4px 0 8px; }
+  .node { padding: 8px 12px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); font-weight: 600; font-size: 14px; }
+  .node small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+  .arrow { color: var(--muted); }
+  .chain-note { font-size: 13px; color: var(--muted); margin: 0 0 16px; }
+  .prose { max-width: 900px; }
+  .prose ul, .prose ol { padding-left: 22px; }
+
+  /* principles */
+  .principles ol { list-style: none; counter-reset: p; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .principles li { counter-increment: p; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 16px 16px 52px; position: relative; margin: 0; }
+  .principles li::before { content: counter(p); position: absolute; left: 16px; top: 16px; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: grid; place-items: center; }
+  .iterating { margin-top: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 20px; }
+
+  footer { margin-top: 48px; padding: 24px 0 40px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
+
+  @media (max-width: 860px) {
+    .flow { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .flow-steps { grid-auto-flow: row; grid-template-columns: 1fr; }
+    .phase-chip { flex-direction: row; align-items: center; }
+    .phase-chip:not(:last-child)::after { content: "↓"; right: auto; left: 22px; top: auto; bottom: -13px; transform: none; }
+    .detail { padding: 16px; }
+    .detail-head .big-num { width: 40px; height: 40px; font-size: 18px; }
+    .skill-grid { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <div>
+        <p class="eyebrow">ADLC Template · guide</p>
+        <h1>AI-assisted Development Lifecycle</h1>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle colour theme">◐ Theme</button>
+    </div>
+    <div class="intro" id="intro"></div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="wrap">
+    <a href="#lifecycle">Lifecycle</a>
+    <a href="#skills">Skills &amp; roles</a>
+    <a href="#traceability">Traceability</a>
+    <a href="#principles">Principles</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section id="lifecycle" aria-labelledby="lifecycle-title">
+    <h2 id="lifecycle-title">Lifecycle</h2>
+    <p class="lede">Seven phases, each with inputs, outputs, a playbook and an exit gate. A phase is done only when
+      <code>make gate-&lt;phase&gt;</code> passes. Pick a phase to see what it involves.</p>
+    <div class="flow">
+      <div class="flow-group"><span>Once per project</span><div class="flow-steps" id="flow-project"></div></div>
+      <div class="flow-group"><span>Per slice</span><div class="flow-steps" id="flow-slice"></div></div>
+    </div>
+    <div class="loops" id="loops" aria-label="Where the lifecycle loops back"></div>
+    <article class="detail" id="phase-detail" aria-live="polite"></article>
+  </section>
+
+  <section id="skills" aria-labelledby="skills-title">
+    <h2 id="skills-title">Skills &amp; roles</h2>
+    <p class="lede">Playbooks live in <code>.adlc/skills/</code> and run in any agent: type <code>/adlc-&lt;x&gt;</code> or say
+      “run the &lt;x&gt; phase”. Reviewer roles in <code>.adlc/roles/</code> always run in an independent context.</p>
+    <div class="toolbar">
+      <div id="filters" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+      <input class="search" id="search" type="search" placeholder="Search skills and roles…" aria-label="Search skills and roles">
+    </div>
+    <div class="skill-grid" id="skill-grid"></div>
+  </section>
+
+  <section id="traceability" aria-labelledby="trace-title">
+    <h2 id="trace-title">Traceability</h2>
+    <p class="lede">Every artifact traces to ids in <code>SPEC.md</code>, forwards and backwards. The gates enforce it;
+      <code>make trace</code> writes the matrix.</p>
+    <div class="chain" aria-label="Forward trace chain">
+      <span class="node">Charter goal</span><span class="arrow">→</span>
+      <span class="node">FR / NFR<small>requirement</small></span><span class="arrow">→</span>
+      <span class="node">AC<small>acceptance criterion</small></span><span class="arrow">→</span>
+      <span class="node">Test<small>AC id in the name</small></span><span class="arrow">→</span>
+      <span class="node">JUnit result</span>
+    </div>
+    <p class="chain-note">FRs also map to design components, and feedback items reference the FR/AC ids they concern.
+      The backward direction checks that every test, component and feedback item points at a real requirement.</p>
+    <div class="prose" id="traceability-body"></div>
+  </section>
+
+  <section id="principles" aria-labelledby="principles-title">
+    <h2 id="principles-title">Principles</h2>
+    <div class="principles" id="principles-body"></div>
+    <div class="iterating">
+      <h3>Iterating</h3>
+      <div id="iterating-body"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    Generated by <code>make guide</code> from <code>docs/ADLC-PROCESS.md</code>, <code>.adlc/skills/</code> and
+    <code>.adlc/roles/</code>. Edit those sources (or <code>adlc-guide/template.html</code>) — not this page.
+  </div>
+</footer>
+
+<script type="application/json" id="adlc-data">{
+ "introHtml": "<p>Every business requirement runs through seven phases. Each phase has <strong>inputs<\/strong>, <strong>outputs (artifacts)<\/strong>, recommended <strong>skills<\/strong>, and an <strong>exit gate<\/strong>. A phase is &quot;done&quot; only when its gate passes — checked by <code>scripts/adlc.py<\/code> (locally via <code>make gate-&lt;phase&gt;<\/code>, and in CI).<\/p>\n<p>The process is <strong>agent-agnostic<\/strong>: the rules live in <code>AGENTS.md<\/code>, the phase playbooks in <code>.adlc/skills/<\/code>, the reviewer roles in <code>.adlc/roles/<\/code>. Any coding agent — or a human — can follow them. <code>make agents-sync<\/code> generates native command files for Claude Code, Copilot, Cursor and Gemini CLI.<\/p>",
+ "flowEdges": [
+  {
+   "from": "6. Review",
+   "to": "Merge / release",
+   "label": "approved"
+  },
+  {
+   "from": "6. Review",
+   "to": "5. Generate code",
+   "label": "changes requested"
+  },
+  {
+   "from": "7. Feedback loop",
+   "to": "2. Specification",
+   "label": "new / changed requirement"
+  },
+  {
+   "from": "7. Feedback loop",
+   "to": "3. Design & Architecture",
+   "label": "design flaw"
+  },
+  {
+   "from": "7. Feedback loop",
+   "to": "4. TDD: tests first",
+   "label": "defect"
+  }
+ ],
+ "phases": [
+  {
+   "number": 1,
+   "name": "Setup",
+   "gate": "setup",
+   "playbooks": [
+    "adlc-setup"
+   ],
+   "roles": [],
+   "goalHtml": "Frame the problem, pick the stack and agents, make the repo runnable.",
+   "inputsHtml": "Business requirement (brief, ticket, email, meeting notes).",
+   "outputsHtml": "<code>docs/00-setup/PROJECT-CHARTER.md<\/code>, <code>CONTEXT.md<\/code>, stack scaffold, <code>Makefile<\/code> wired (tests write JUnit XML), agent adapters synced.",
+   "playbookHtml": "<code>adlc-setup<\/code>",
+   "skillsHtml": "<code>adlc-grill<\/code> / <code>grill-me<\/code>, <code>brainstorming<\/code>, document skills (<code>pdf<\/code>, <code>docx<\/code>, <code>xlsx<\/code>), <code>deep-research<\/code>",
+   "gateHtml": "Charter and glossary complete; <code>make test<\/code> runs."
+  },
+  {
+   "number": 2,
+   "name": "Specification",
+   "gate": "spec",
+   "playbooks": [
+    "adlc-spec"
+   ],
+   "roles": [
+    "spec-critic"
+   ],
+   "goalHtml": "Unambiguous, testable requirements.",
+   "inputsHtml": "Charter, stakeholder answers, feedback routed → Spec.",
+   "outputsHtml": "<code>docs/01-spec/SPEC.md<\/code> with FR / NFR / AC ids, Given-When-Then, out-of-scope, resolved questions.",
+   "playbookHtml": "<code>adlc-spec<\/code> + <code>spec-critic<\/code> role",
+   "skillsHtml": "<code>adlc-grill<\/code> / <code>grill-with-docs<\/code>, <code>write-a-prd<\/code>, Spec Kit <code>/speckit.specify<\/code>",
+   "gateHtml": "No placeholders; every FR has ≥1 AC; ids unique; no <code>Open<\/code> questions; approved."
+  },
+  {
+   "number": 3,
+   "name": "Design & Architecture",
+   "gate": "design",
+   "playbooks": [
+    "adlc-design"
+   ],
+   "roles": [],
+   "goalHtml": "Decide <em>how<\/em> before writing code.",
+   "inputsHtml": "Approved SPEC.",
+   "outputsHtml": "<code>docs/02-design/ARCHITECTURE.md<\/code> (C4 context/containers, components, ER model, sequences — Mermaid), ADRs, API contracts.",
+   "playbookHtml": "<code>adlc-design<\/code>",
+   "skillsHtml": "<code>codebase-design<\/code>, <code>architecture<\/code> (ADRs), <code>system-design<\/code>",
+   "gateHtml": "No placeholders; Mermaid diagrams; project ADR accepted; FR ↔ component traced both ways."
+  },
+  {
+   "number": 4,
+   "name": "TDD (tests first)",
+   "gate": "tdd",
+   "playbooks": [
+    "adlc-tdd",
+    "adlc-trace"
+   ],
+   "roles": [
+    "test-auditor"
+   ],
+   "goalHtml": "Executable acceptance criteria.",
+   "inputsHtml": "SPEC ACs for the slice, component interfaces.",
+   "outputsHtml": "<code>TEST-PLAN.md<\/code>; failing tests named with AC ids; <code>TRACEABILITY.md<\/code>.",
+   "playbookHtml": "<code>adlc-tdd<\/code> + <code>test-auditor<\/code> role, <code>adlc-trace<\/code>",
+   "skillsHtml": "<code>test-driven-development<\/code> or <code>tdd<\/code>, <code>testing-strategy<\/code>",
+   "gateHtml": "AC ↔ test traced both ways (no uncovered ACs, orphans or dangling ids); tests red for the right reason."
+  },
+  {
+   "number": 5,
+   "name": "Generate code",
+   "gate": "build",
+   "playbooks": [
+    "adlc-build"
+   ],
+   "roles": [],
+   "goalHtml": "Make the tests pass with the simplest design that respects the architecture.",
+   "inputsHtml": "Red tests, ARCHITECTURE.md, ADRs.",
+   "outputsHtml": "Code in <code>src/<\/code>; green tests; refactored; lint clean.",
+   "playbookHtml": "<code>adlc-build<\/code>",
+   "skillsHtml": "<code>writing-plans<\/code> → <code>executing-plans<\/code>, <code>systematic-debugging<\/code>, <code>verification-before-completion<\/code>",
+   "gateHtml": "<code>make test<\/code> and <code>make lint<\/code> pass; traceability complete; every AC passing in JUnit results."
+  },
+  {
+   "number": 6,
+   "name": "Review",
+   "gate": "review",
+   "playbooks": [
+    "adlc-review"
+   ],
+   "roles": [
+    "code-reviewer"
+   ],
+   "goalHtml": "Independent verification against spec, design, traceability and the quality bar.",
+   "inputsHtml": "Diff / PR, SPEC, ARCHITECTURE, TRACEABILITY.md.",
+   "outputsHtml": "<code>docs/05-review/reviews/&lt;date&gt;-&lt;slice&gt;.md<\/code> with findings and a verdict.",
+   "playbookHtml": "<code>adlc-review<\/code> + <code>code-reviewer<\/code> role",
+   "skillsHtml": "agent built-in review (<code>/code-review<\/code>, <code>/review<\/code>, …), security review, <code>requesting-code-review<\/code>, <code>receiving-code-review<\/code>",
+   "gateHtml": "Latest review <code>Verdict: APPROVED<\/code>; traceability matrix present."
+  },
+  {
+   "number": 7,
+   "name": "Feedback loop",
+   "gate": "feedback",
+   "playbooks": [
+    "adlc-feedback",
+    "adlc-retro"
+   ],
+   "roles": [],
+   "goalHtml": "Learn and route every signal back to the right phase.",
+   "inputsHtml": "Review leftovers, user feedback, incidents, metrics.",
+   "outputsHtml": "<code>FEEDBACK-LOG.md<\/code> entries with related ids and a route; retro; new &quot;Lessons learned&quot; in <code>AGENTS.md<\/code>.",
+   "playbookHtml": "<code>adlc-feedback<\/code>, <code>adlc-retro<\/code>",
+   "skillsHtml": "<code>incident-response<\/code>, <code>tech-debt<\/code>, <code>improve-codebase-architecture<\/code>, <code>skill-creator<\/code>",
+   "gateHtml": "Every feedback item has a route and an owner."
+  }
+ ],
+ "principlesHtml": "<ol><li><strong>Spec is the source of truth.<\/strong> Everything traces to ids in <code>SPEC.md<\/code>: <code>FR-xxx<\/code> functional requirement, <code>NFR-xxx<\/code> non-functional, <code>AC-xxx<\/code> acceptance criterion.<\/li><li><strong>Humans approve, agents produce.<\/strong> The AI drafts every artifact; a human signs off at each gate.<\/li><li><strong>Tests before code.<\/strong> Every AC has a failing test <em>before<\/em> implementation starts.<\/li><li><strong>Traceability in both directions<\/strong> — see below. Enforced by the gates, not by goodwill.<\/li><li><strong>Decisions are written down.<\/strong> Non-obvious design choices become ADRs. <strong>Standards are explicit.<\/strong> Code follows <code>docs/standards/<\/code> (general, frontend, backend, .NET, Blazor, React, Python); deviations from a MUST need an ADR; reviews cite rule ids.<\/li><li><strong>Independent review.<\/strong> The context that wrote the work never approves it.<\/li><li><strong>Small increments.<\/strong> One vertical slice (a few ACs) per branch / PR.<\/li><li><strong>Close the loop.<\/strong> Feedback flows back into spec, design, tests or the agent rules — the process improves itself.<\/li><\/ol>",
+ "traceabilityHtml": "<div class=\"table-wrap\"><table><thead><tr><th>Direction<\/th><th>Question it answers<\/th><th>Checked by<\/th><th>Gate<\/th><\/tr><\/thead><tbody><tr><td>Forward: FR → AC<\/td><td>Is every requirement testable?<\/td><td>FR has ≥1 AC under its heading<\/td><td>spec<\/td><\/tr><tr><td>Forward: FR → component<\/td><td>Is every requirement designed?<\/td><td>FR appears in an ARCHITECTURE table<\/td><td>design<\/td><\/tr><tr><td>Backward: component → FR<\/td><td>Is every component justified?<\/td><td>ids in ARCHITECTURE exist in SPEC<\/td><td>design<\/td><\/tr><tr><td>Forward: AC → test<\/td><td>Is every acceptance criterion verified?<\/td><td>AC id appears in a test file<\/td><td>tdd, build<\/td><\/tr><tr><td>Backward: test → AC<\/td><td>Does every test verify a real requirement?<\/td><td>no orphan test files, no dangling or deprecated ids<\/td><td>tdd, build<\/td><\/tr><tr><td>Forward: AC → result<\/td><td>Does the verification pass?<\/td><td>AC id in JUnit testcase names, no failures<\/td><td>build<\/td><\/tr><tr><td>Backward: code → AC<\/td><td>Is every behaviour requested?<\/td><td>review: diff behaviour must be covered by a traced test<\/td><td>review<\/td><\/tr><tr><td>Feedback → FR/AC<\/td><td>Which requirement does this signal concern?<\/td><td>&quot;Related ids&quot; column in the feedback log<\/td><td>feedback<\/td><\/tr><\/tbody><\/table><\/div>\n<p><code>make trace<\/code> writes the full matrix to <code>docs/03-tests/TRACEABILITY.md<\/code>: forward table (FR → component → AC → test file:line → result), backward table (test file → ids → FR → component), and a Gaps section. Conventions:<\/p>\n<ul><li>Ids: <code>FR-001<\/code>, <code>NFR-001<\/code>, <code>AC-001<\/code> (3+ digits). In code <code>AC_001<\/code> is also accepted.<\/li><li>An AC is defined as <code>- **AC-001** — title<\/code> under its <code>### FR-001 — title<\/code> heading.<\/li><li>Put the AC id <strong>in the test name<\/strong> so it also reaches JUnit results.<\/li><li>Test files that verify nothing (helpers) carry the comment <code>adlc: no-trace<\/code>.<\/li><li>Withdraw requirements with <code>~~strikethrough~~<\/code>; never renumber or reuse ids.<\/li><\/ul>\n<hr>",
+ "iteratingHtml": "<p>The lifecycle runs <strong>per slice<\/strong>, not once per project:<\/p>\n<ol><li>Setup once.<\/li><li>Spec the whole scope at FR level; detail ACs for the first slice.<\/li><li>Design the overall architecture once; add ADRs per slice as needed.<\/li><li>Loop 4 → 5 → 6 for each slice.<\/li><li>Feedback continuously; re-enter at 2, 3 or 4 depending on the signal.<\/li><\/ol>\n<p><code>.adlc/STATUS.md<\/code> records which phase each slice is in.<\/p>",
+ "skills": [
+  {
+   "name": "adlc-setup",
+   "title": "Phase 1 — Setup",
+   "kind": "phase",
+   "phase": 1,
+   "usedIn": [
+    1
+   ],
+   "descriptionHtml": "ADLC Phase 1 — turn a raw business requirement into a project charter, initial glossary and a runnable repo with the chosen stack and agent adapters. Use when starting a new project from this template.",
+   "bodyHtml": "<p><strong>Input:<\/strong> the business requirement (pasted text, file, ticket, meeting transcript).<\/p>\n<h4>Steps<\/h4>\n<ol><li><strong>Ingest<\/strong> the requirement. If it is a document (PDF, DOCX, XLSX, PPTX), extract its text with a document skill. Summarise it back in 5 bullets and confirm understanding.<\/li><li><strong>Interview<\/strong> to fill gaps using <code>adlc-grill<\/code> (or <code>grill-me<\/code>): one question at a time, each with a recommended answer. Cover problem &amp; who feels it, success metrics, scope / out of scope, constraints (regulatory, integrations, deadline), stack preferences, which coding agents the team uses.<\/li><li><strong>Write <code>docs/00-setup/PROJECT-CHARTER.md<\/code><\/strong> — replace every <code>{{placeholder}}<\/code>. Unknowns become rows in Risks &amp; assumptions, not guesses.<\/li><li><strong>Seed <code>CONTEXT.md<\/code><\/strong> with the domain summary and the first 5–15 glossary terms.<\/li><li><strong>Choose the stack<\/strong> with the user (supported standards: .NET, Blazor, React, Python — see <code>docs/standards/<\/code>; for another stack, draft a new standard in the same format first). Record the stack and the <strong>applicable standards<\/strong> in the charter&#x27;s stack table and write <code>docs/02-design/adr/0002-technology-stack.md<\/code> from the ADR template (Status: Proposed until Phase 3 approval).<\/li><li><strong>Scaffold<\/strong> for that stack, starting from the starter configs in <code>templates/stacks/&lt;stack&gt;/<\/code> (follow <code>templates/stacks/README.md<\/code>; fill in current package versions): package manifest, test framework, linter/formatter, <code>.gitignore<\/code> entries, <code>src/<\/code> and <code>tests/{unit,integration,acceptance}<\/code>. Set <code>SETUP_CMD<\/code>, <code>TEST_CMD<\/code>, <code>LINT_CMD<\/code> in the <code>Makefile<\/code> and configure the test runner to <strong>write JUnit XML to <code>reports/<\/code><\/strong> (needed for pass/fail traceability). Update the toolchain step in <code>.github/workflows/adlc.yml<\/code>.<\/li><li><strong>Agent adapters:<\/strong> run <code>make agents-sync ONLY=&lt;agents the team uses&gt;<\/code> (choices: <code>claude<\/code>, <code>agents<\/code>, <code>copilot<\/code>, <code>cursor<\/code>, <code>gemini<\/code>) and delete adapter folders for agents nobody uses.<\/li><li>Run <code>make setup &amp;&amp; make test<\/code> (zero tests is fine; the command must succeed).<\/li><li>Fill in the project name in <code>.adlc/STATUS.md<\/code>; run <code>make gate-setup<\/code>; show the output.<\/li><li>Ask the user to approve the charter. On approval tick Phase 1 and suggest <code>/adlc-spec<\/code>.<\/li><\/ol>\n<h4>Recommended skills<\/h4>\n<div class=\"table-wrap\"><table><thead><tr><th>When<\/th><th>Skill<\/th><th>Source<\/th><\/tr><\/thead><tbody><tr><td>Interview the requester<\/td><td>★ <code>adlc-grill<\/code> / <code>grill-me<\/code><\/td><td>bundled / mattpocock<\/td><\/tr><tr><td>Explore alternatives before fixing scope<\/td><td><code>brainstorming<\/code><\/td><td>obra/superpowers<\/td><\/tr><tr><td>Read requirement documents<\/td><td><code>pdf<\/code>, <code>docx<\/code>, <code>xlsx<\/code>, <code>pptx<\/code><\/td><td>anthropics/skills<\/td><\/tr><tr><td>Market / tech scan for the stack decision<\/td><td><code>deep-research<\/code><\/td><td>anthropic<\/td><\/tr><tr><td>Seed the glossary<\/td><td><code>domain-modeling<\/code><\/td><td>community<\/td><\/tr><tr><td>Requirement too big for one session<\/td><td><code>wayfinder<\/code><\/td><td>community<\/td><\/tr><tr><td>Find a missing capability<\/td><td><code>find-skills<\/code><\/td><td>community<\/td><\/tr><\/tbody><\/table><\/div>\n<h4>Do not<\/h4>\n<ul><li>Write production code.<\/li><li>Pick a stack without the user&#x27;s confirmation.<\/li><\/ul>",
+   "source": ".adlc/skills/adlc-setup/SKILL.md"
+  },
+  {
+   "name": "adlc-spec",
+   "title": "Phase 2 — Specification",
+   "kind": "phase",
+   "phase": 2,
+   "usedIn": [
+    2
+   ],
+   "descriptionHtml": "ADLC Phase 2 — write or refine docs/01-spec/SPEC.md with FR/NFR ids and Given-When-Then acceptance criteria, then have it critiqued independently. Use after setup, or when feedback routes a new or changed requirement to the spec.",
+   "bodyHtml": "<p><strong>Inputs:<\/strong> approved <code>PROJECT-CHARTER.md<\/code>, <code>CONTEXT.md<\/code>, feedback items routed &quot;→ Spec&quot;.<\/p>\n<h4>Steps<\/h4>\n<ol><li>Read the charter, glossary and existing SPEC. When iterating, keep existing ids — never renumber; deprecate with <code>~~strikethrough~~<\/code>.<\/li><li><strong>User stories → FRs.<\/strong> One <code>### FR-xxx — title<\/code> section per capability with priority (MoSCoW) and slice (S1, S2 …). Make S1 a thin, end-to-end, demoable slice.<\/li><li><strong>Acceptance criteria<\/strong> under each FR as <code>- **AC-xxx** — title<\/code> followed by Given/When/Then. At least one happy path and one error/edge path per FR. Concrete, observable values (<code>&quot;amount 0.00 is rejected with AMOUNT_ZERO&quot;<\/code>, not <code>&quot;invalid amounts are handled&quot;<\/code>). AC ids are globally unique and must sit under their FR heading — this is what makes traceability work.<\/li><li><strong>NFRs<\/strong> — quantify each (numbers, thresholds, standards). In the &quot;Measure / AC&quot; column name how it will be verified (an AC, a load test id, monitoring).<\/li><li><strong>Ambiguities<\/strong> become <code>OPEN-xxx<\/code> rows. Resolve them with the user via <code>adlc-grill<\/code>, one at a time, each with a recommended answer. Never resolve them yourself.<\/li><li><strong>Critique<\/strong> in an independent context with the <code>spec-critic<\/code> role (<code>.adlc/roles/spec-critic.md<\/code>). Apply or discuss each finding.<\/li><li>Add new domain terms to <code>CONTEXT.md<\/code>.<\/li><li>Run <code>make gate-spec<\/code> and <code>make trace<\/code> (the forward matrix will show every AC as &quot;missing&quot; — expected until Phase 4). Ask the user to tick the approval boxes. On approval tick Phase 2; suggest <code>/adlc-design<\/code>.<\/li><\/ol>\n<h4>Quality bar<\/h4>\n<p>INVEST (Independent · Negotiable · Valuable · Estimable · Small · Testable). Each AC must translate directly into one automated test.<\/p>\n<h4>Recommended skills<\/h4>\n<div class=\"table-wrap\"><table><thead><tr><th>When<\/th><th>Skill<\/th><th>Source<\/th><\/tr><\/thead><tbody><tr><td>Resolve <code>OPEN-xxx<\/code> questions<\/td><td>★ <code>adlc-grill<\/code> / <code>grill-with-docs<\/code><\/td><td>bundled / mattpocock<\/td><\/tr><tr><td>Turn a long brief into requirements<\/td><td><code>write-a-prd<\/code><\/td><td>mattpocock<\/td><\/tr><tr><td>Teams standardised on Spec Kit<\/td><td><code>/speckit.specify<\/code>, <code>/speckit.clarify<\/code><\/td><td>github/spec-kit<\/td><\/tr><tr><td>Independent critique<\/td><td>★ <code>spec-critic<\/code> role<\/td><td>bundled<\/td><\/tr><tr><td>Keep vocabulary sharp<\/td><td><code>domain-modeling<\/code><\/td><td>community<\/td><\/tr><\/tbody><\/table><\/div>",
+   "source": ".adlc/skills/adlc-spec/SKILL.md"
+  },
+  {
+   "name": "adlc-design",
+   "title": "Phase 3 — Design & Architecture",
+   "kind": "phase",
+   "phase": 3,
+   "usedIn": [
+    3
+   ],
+   "descriptionHtml": "ADLC Phase 3 — produce ARCHITECTURE.md with C4, sequence and ER Mermaid diagrams, map every FR to a component (both directions), and record decisions as ADRs. Use after the spec is approved or when feedback routes a design flaw.",
+   "bodyHtml": "<p><strong>Inputs:<\/strong> approved SPEC.md, CONTEXT.md, charter constraints, existing ADRs.<\/p>\n<h4>Steps<\/h4>\n<ol><li>Read SPEC, CONTEXT, charter and every ADR.<\/li><li><strong>Quality goals:<\/strong> the top 3 NFRs that drive the architecture.<\/li><li><strong>Context &amp; containers:<\/strong> C4 level 1 and 2 diagrams in Mermaid in <code>ARCHITECTURE.md<\/code>.<\/li><li><strong>Standards:<\/strong> apply the architecture rules in <code>docs/standards/BACKEND.md<\/code> and/or <code>FRONTEND.md<\/code> plus the stack standard (e.g. BE-01 domain/adapter separation, FE-01 feature folders, NET-04/PY-02/RE-04 layouts). Any deviation from a MUST becomes an ADR.<\/li><li><strong>Components:<\/strong> design deep modules — small interfaces hiding significant behaviour, at clean, testable seams. Fill the component table; its &quot;Covers FR&quot; column must name <strong>every active FR<\/strong> (forward trace) and <strong>only FRs that exist<\/strong> in SPEC (backward trace). The gate checks both.<\/li><li><strong>Data model<\/strong> (<code>erDiagram<\/code>) and <strong>key sequences<\/strong> (<code>sequenceDiagram<\/code>) for each Must FR, annotating steps with AC ids.<\/li><li><strong>Contracts:<\/strong> if there is an API, write <code>docs/02-design/api/openapi.yaml<\/code> (or AsyncAPI/proto) — Phase 4 tests target it.<\/li><li><strong>Decisions:<\/strong> for each significant choice present 2–3 options with trade-offs, let the user decide, then write an ADR from <code>adr/0000-adr-template.md<\/code> with its <code>Related: FR/NFR<\/code> ids. Promote <code>0002-technology-stack.md<\/code> to Accepted.<\/li><li>Cross-cutting concerns: security, errors, logging, config, PII.<\/li><li>Run <code>make gate-design<\/code> and <code>make trace<\/code>; show output. Get approval; tick Phase 3; suggest <code>/adlc-tdd<\/code> for slice S1.<\/li><\/ol>\n<h4>Recommended skills<\/h4>\n<div class=\"table-wrap\"><table><thead><tr><th>When<\/th><th>Skill<\/th><th>Source<\/th><\/tr><\/thead><tbody><tr><td>Module boundaries &amp; interfaces<\/td><td>★ <code>codebase-design<\/code><\/td><td>community<\/td><\/tr><tr><td>Write/evaluate ADRs<\/td><td>★ <code>architecture<\/code><\/td><td>anthropic engineering plugin<\/td><\/tr><tr><td>Services, APIs, data modelling<\/td><td><code>system-design<\/code><\/td><td>anthropic engineering plugin<\/td><\/tr><tr><td>Pressure-test the design<\/td><td><code>adlc-grill<\/code> / <code>grill-me<\/code><\/td><td>bundled / mattpocock<\/td><\/tr><tr><td>Teams on Spec Kit<\/td><td><code>/speckit.plan<\/code><\/td><td>github/spec-kit<\/td><\/tr><tr><td>Polish docs<\/td><td><code>documentation<\/code><\/td><td>anthropic engineering plugin<\/td><\/tr><\/tbody><\/table><\/div>\n<h4>Do not<\/h4>\n<ul><li>Design for requirements that are not in the spec. Note them under Risks.<\/li><li>Write implementation code.<\/li><\/ul>",
+   "source": ".adlc/skills/adlc-design/SKILL.md"
+  },
+  {
+   "name": "adlc-tdd",
+   "title": "Phase 4 — TDD (tests first)",
+   "kind": "phase",
+   "phase": 4,
+   "usedIn": [
+    4
+   ],
+   "descriptionHtml": "ADLC Phase 4 — write failing tests for a slice&#x27;s acceptance criteria before any implementation, each referencing its AC id so traceability works both ways. Use when starting a slice after design approval, or when a defect is routed back from feedback.",
+   "bodyHtml": "<p><strong>Inputs:<\/strong> slice id (e.g. S1) or defect (FB-xxx); SPEC ACs; ARCHITECTURE components/contracts.<\/p>\n<h4>Steps<\/h4>\n<ol><li>Branch: <code>slice/S1-&lt;short-name&gt;<\/code> (or <code>fix/FB-xxx-&lt;short-name&gt;<\/code>).<\/li><li>List the slice&#x27;s ACs. For a defect, first add a new AC (or identify the violated one) that captures the correct behaviour — every fix traces to a requirement.<\/li><li>Update <code>docs/03-tests/TEST-PLAN.md<\/code> for the slice (levels, fixtures, data).<\/li><li>For <strong>each AC<\/strong>, write at least one acceptance test through the public interface in ARCHITECTURE.md. <strong>Put the AC id in the test name<\/strong> (<code>test_AC_001_...<\/code>, <code>it(&quot;AC-001 ...&quot;)<\/code>, <code>@DisplayName(&quot;AC-001 ...&quot;)<\/code>, Gherkin <code>@AC-001<\/code>) — the name, not only a comment, so it also appears in JUnit results. Unit tests reference the AC(s) they support.<ul><li>Test behaviour, not implementation; mock only at system boundaries; concrete values.<\/li><li>Follow the testing rules of the stack standard (<code>NET-80..84<\/code>, <code>RE-70..73<\/code>, <code>PY-70..74<\/code>), including its JUnit output setting.<\/li><li>Helpers/fixtures that verify nothing get the marker comment <code>adlc: no-trace<\/code>.<\/li><\/ul><\/li><li>Create only the <strong>minimum stubs<\/strong> needed for tests to compile/import. No logic.<\/li><li><strong>Run the tests: they must fail for the right reason<\/strong> (assertion / not-implemented, not import or syntax errors). Show the output.<\/li><li>Run <code>make trace<\/code>: zero uncovered ACs, zero orphan tests, zero dangling ids. Use <code>adlc-trace<\/code> to fix gaps.<\/li><li>Audit in an independent context with the <code>test-auditor<\/code> role. Fix weak tests.<\/li><li><code>make gate-tdd<\/code>. Commit <code>test(S1): failing tests for AC-001..AC-004<\/code>. Tick 4; suggest <code>/adlc-build<\/code>.<\/li><\/ol>\n<h4>Recommended skills<\/h4>\n<div class=\"table-wrap\"><table><thead><tr><th>When<\/th><th>Skill<\/th><th>Source<\/th><\/tr><\/thead><tbody><tr><td>Red-green-refactor discipline<\/td><td>★ <code>test-driven-development<\/code> (strict) or <code>tdd<\/code> (light) — pick one<\/td><td>obra/superpowers / mattpocock<\/td><\/tr><tr><td>Test levels, tooling, coverage<\/td><td><code>testing-strategy<\/code><\/td><td>anthropic engineering plugin<\/td><\/tr><tr><td>Fix traceability gaps<\/td><td>★ <code>adlc-trace<\/code><\/td><td>bundled<\/td><\/tr><tr><td>Independent test audit<\/td><td>★ <code>test-auditor<\/code> role<\/td><td>bundled<\/td><\/tr><\/tbody><\/table><\/div>",
+   "source": ".adlc/skills/adlc-tdd/SKILL.md"
+  },
+  {
+   "name": "adlc-build",
+   "title": "Phase 5 — Generate code",
+   "kind": "phase",
+   "phase": 5,
+   "usedIn": [
+    5
+   ],
+   "descriptionHtml": "ADLC Phase 5 — implement the slice so the failing AC tests pass, one test at a time, respecting the architecture and ADRs, then refactor. Use after the TDD gate passes for a slice.",
+   "bodyHtml": "<p><strong>Inputs:<\/strong> red tests for the slice, ARCHITECTURE.md, ADRs, CONTEXT.md.<\/p>\n<h4>Steps<\/h4>\n<ol><li>Confirm <code>make gate-tdd<\/code> passes and the tests are red. If not, go back to <code>/adlc-tdd<\/code>. Load <code>docs/standards/GENERAL.md<\/code> and the standards matching the stack (see <code>AGENTS.md<\/code> rule 8).<\/li><li><strong>Plan<\/strong> the order: start with the AC whose tests have the fewest dependencies. For a large slice write a short task list and get the user&#x27;s nod.<\/li><li><strong>Loop per test:<\/strong><ol><li>Write the simplest code in <code>src/<\/code> that makes <em>this<\/em> test pass.<\/li><li>Run the suite. Green → commit <code>feat(S1): AC-001 &lt;summary&gt;<\/code>. Red → fix the code, not the test.<\/li><li>Refactor while green: remove duplication, use CONTEXT.md names, keep modules deep.<\/li><\/ol><\/li><li><strong>Never weaken a test to make it pass.<\/strong> If a test contradicts the spec, stop, explain, ask.<\/li><li><strong>Never diverge from ARCHITECTURE.md / ADRs silently<\/strong> — propose an ADR first.<\/li><li>When the slice is green: <code>make lint<\/code>, full suite, coverage per TEST-PLAN. Self-check the diff against the MUST rules of the applicable standards before handing over to review.<\/li><li>Update docs the change touches (README run instructions, API contract, ARCHITECTURE).<\/li><li><code>make gate-build<\/code> (tests, lint, traceability <strong>and<\/strong> JUnit results: every AC passing). Tick 5; suggest <code>/adlc-review<\/code>.<\/li><\/ol>\n<p>Independent ACs touching different files may be built in parallel by separate agents in separate git worktrees.<\/p>\n<h4>Recommended skills<\/h4>\n<div class=\"table-wrap\"><table><thead><tr><th>When<\/th><th>Skill<\/th><th>Source<\/th><\/tr><\/thead><tbody><tr><td>Break the slice into small verified tasks<\/td><td>★ <code>writing-plans<\/code> → <code>executing-plans<\/code><\/td><td>obra/superpowers<\/td><\/tr><tr><td>Parallelise independent ACs<\/td><td><code>subagent-driven-development<\/code>, <code>dispatching-parallel-agents<\/code>, <code>using-git-worktrees<\/code><\/td><td>obra/superpowers<\/td><\/tr><tr><td>A test won&#x27;t go green<\/td><td>★ <code>systematic-debugging<\/code> / <code>debug<\/code><\/td><td>obra/superpowers / anthropic engineering plugin<\/td><\/tr><tr><td>Evidence before &quot;done&quot;<\/td><td>★ <code>verification-before-completion<\/code><\/td><td>obra/superpowers<\/td><\/tr><tr><td>Teams on Spec Kit<\/td><td><code>/speckit.tasks<\/code>, <code>/speckit.implement<\/code><\/td><td>github/spec-kit<\/td><\/tr><\/tbody><\/table><\/div>",
+   "source": ".adlc/skills/adlc-build/SKILL.md"
+  },
+  {
+   "name": "adlc-review",
+   "title": "Phase 6 — Review",
+   "kind": "phase",
+   "phase": 6,
+   "usedIn": [
+    6
+   ],
+   "descriptionHtml": "ADLC Phase 6 — independently review a slice&#x27;s diff against spec, architecture, traceability, security and the quality checklist; record findings with severities and a verdict. Use after the build gate passes, before merging.",
+   "bodyHtml": "<p><strong>Inputs:<\/strong> branch diff vs <code>main<\/code>, SPEC, ARCHITECTURE, ADRs, <code>docs/05-review/REVIEW-CHECKLIST.md<\/code>.<\/p>\n<h4>Steps<\/h4>\n<ol><li>Copy <code>docs/05-review/REVIEW-RECORD-TEMPLATE.md<\/code> → <code>docs/05-review/reviews/&lt;YYYY-MM-DD&gt;-&lt;slice&gt;.md<\/code>.<\/li><li><code>make trace<\/code> — the regenerated <code>docs/03-tests/TRACEABILITY.md<\/code> is review evidence. Check both directions for the slice: each AC → passing test, and each new/changed test → a real AC.<\/li><li>Run <strong>independent<\/strong> reviewers (fresh context — they must not share the author&#x27;s assumptions):<ul><li><code>code-reviewer<\/code> role (<code>.adlc/roles/code-reviewer.md<\/code>) — spec, design, traceability, coding standards (<code>docs/standards/<\/code>, findings cite rule ids), checklist.<\/li><li>Your agent&#x27;s built-in review, if any — e.g. Claude Code <code>/code-review<\/code> and <code>/security-review<\/code>, Codex <code>/review<\/code>, Copilot code review on the PR, Cursor Bugbot.<\/li><li>A security pass is mandatory when the slice touches auth, PII, payments or external input.<\/li><\/ul><\/li><li><strong>Verify<\/strong> each finding (reproduce, or give a concrete failing scenario). Drop false positives with a one-line reason.<\/li><li>Record findings with severity per the checklist scale.<\/li><li>Present them to the user. Critical/High: fix now (Phase 5 loop; add a test first if the finding is missing behaviour — new AC if the spec missed it). Medium/Low: user decides — fix now or log <code>FB-xxx<\/code> in the feedback log.<\/li><li>When no Critical/High remain open, set <code>Verdict: APPROVED<\/code> (only with the user&#x27;s agreement).<\/li><li><code>make gate-review<\/code>. Open the PR with <code>.github/pull_request_template.md<\/code>. Tick 6; after merge suggest <code>/adlc-feedback<\/code>.<\/li><\/ol>\n<h4>Recommended skills<\/h4>\n<div class=\"table-wrap\"><table><thead><tr><th>When<\/th><th>Skill<\/th><th>Source<\/th><\/tr><\/thead><tbody><tr><td>Independent spec/design review<\/td><td>★ <code>code-reviewer<\/code> role<\/td><td>bundled<\/td><\/tr><tr><td>Correctness review of the diff<\/td><td>★ built-in review (<code>/code-review<\/code>, <code>/review<\/code>, …)<\/td><td>your agent<\/td><\/tr><tr><td>Security review<\/td><td>★ <code>/security-review<\/code> or equivalent<\/td><td>your agent<\/td><\/tr><tr><td>Structured reviewer + severity triage<\/td><td><code>requesting-code-review<\/code><\/td><td>obra/superpowers<\/td><\/tr><tr><td>Handling review feedback rigorously<\/td><td><code>receiving-code-review<\/code><\/td><td>obra/superpowers<\/td><\/tr><tr><td>Simplification pass<\/td><td><code>simplify<\/code><\/td><td>Claude Code built-in<\/td><\/tr><tr><td>Release readiness<\/td><td><code>deploy-checklist<\/code><\/td><td>anthropic engineering plugin<\/td><\/tr><tr><td>Merge / PR / cleanup<\/td><td><code>finishing-a-development-branch<\/code><\/td><td>obra/superpowers<\/td><\/tr><\/tbody><\/table><\/div>",
+   "source": ".adlc/skills/adlc-review/SKILL.md"
+  },
+  {
+   "name": "adlc-feedback",
+   "title": "Phase 7 — Feedback loop",
+   "kind": "phase",
+   "phase": 7,
+   "usedIn": [
+    7
+   ],
+   "descriptionHtml": "ADLC Phase 7 — collect feedback (review leftovers, user feedback, incidents, metrics, retro), log it, route each item back to Spec, Design, TDD or Process with its requirement ids, and turn durable lessons into agent rules. Use after a slice merges, after an incident, or at iteration end.",
+   "bodyHtml": "<p><strong>Inputs:<\/strong> review records, PR comments, user/stakeholder feedback, incidents, metrics, retro notes.<\/p>\n<h4>Steps<\/h4>\n<ol><li><strong>Collect<\/strong> signals since the last pass: unresolved Medium/Low review findings, PR comments, user reports, production errors/metrics, the user&#x27;s own observations.<\/li><li><strong>Log<\/strong> each as <code>FB-xxx<\/code> in <code>docs/06-feedback/FEEDBACK-LOG.md<\/code> with source, severity, and the <strong>related FR/AC/NFR ids<\/strong> (so feedback is traceable to requirements too).<\/li><li><strong>Route<\/strong> each item and assign an owner (confirm with the user):<ul><li>New/changed requirement → <strong>Spec<\/strong> (<code>/adlc-spec<\/code>)<\/li><li>Structural problem / NFR missed → <strong>Design<\/strong> (<code>/adlc-design<\/code>, new ADR)<\/li><li>Defect → <strong>TDD<\/strong> (<code>/adlc-tdd<\/code>: reproducing test first)<\/li><li>Agent/process mistake → <strong>Process<\/strong><\/li><li>Not now → <strong>Backlog<\/strong> (ticket link)<\/li><\/ul><\/li><li><strong>Retro<\/strong> at the end of each slice/iteration: run <code>/adlc-retro<\/code>.<\/li><li><strong>Improve the process:<\/strong> for each Process item add a concise rule to <code>AGENTS.md<\/code> → &quot;Lessons learned&quot; (<code>- YYYY-MM-DD — &lt;rule&gt;. Why: &lt;incident&gt;.<\/code>), or improve the relevant playbook in <code>.adlc/skills/<\/code> / role in <code>.adlc/roles/<\/code>, then <code>make agents-sync<\/code>. Keep rules few and specific.<\/li><li><code>make gate-feedback<\/code>; tick 7; suggest the next phase for the highest-priority item.<\/li><\/ol>\n<h4>Recommended skills<\/h4>\n<div class=\"table-wrap\"><table><thead><tr><th>When<\/th><th>Skill<\/th><th>Source<\/th><\/tr><\/thead><tbody><tr><td>Retrospective<\/td><td>★ <code>adlc-retro<\/code><\/td><td>bundled<\/td><\/tr><tr><td>Production incident &amp; postmortem<\/td><td>★ <code>incident-response<\/code><\/td><td>anthropic engineering plugin<\/td><\/tr><tr><td>Periodic debt audit<\/td><td><code>tech-debt<\/code><\/td><td>anthropic engineering plugin<\/td><\/tr><tr><td>Structural improvements after several slices<\/td><td><code>improve-codebase-architecture<\/code><\/td><td>mattpocock<\/td><\/tr><tr><td>Turn repeated lessons into better skills<\/td><td><code>skill-creator<\/code><\/td><td>anthropics/skills<\/td><\/tr><tr><td>Hand context to the next session/agent<\/td><td><code>handoff<\/code><\/td><td>community<\/td><\/tr><tr><td>Status updates to stakeholders<\/td><td><code>standup<\/code><\/td><td>anthropic engineering plugin<\/td><\/tr><\/tbody><\/table><\/div>",
+   "source": ".adlc/skills/adlc-feedback/SKILL.md"
+  },
+  {
+   "name": "adlc",
+   "title": "ADLC — status and next step",
+   "kind": "helper",
+   "phase": null,
+   "usedIn": [],
+   "descriptionHtml": "Show where this project is in the ADLC lifecycle, the gate status, traceability gaps and the next step. Use at the start of a session, when the user asks &quot;where are we&quot; or &quot;what&#x27;s next&quot;, or before starting any work in an ADLC-template repo.",
+   "bodyHtml": "<ol><li>Read <code>AGENTS.md<\/code>, <code>.adlc/STATUS.md<\/code> and <code>docs/ADLC-PROCESS.md<\/code>.<\/li><li>Run <code>make gate-&lt;current-phase&gt;<\/code>. From Phase 2 onward also run <code>make trace<\/code>. Show the output.<\/li><li><p>Report in this shape:<\/p><pre><code>Phase: &lt;n. name&gt;   Slice: &lt;id or —&gt;\nGate: PASSED | FAILED (&lt;k&gt; issues)\nTraceability: FRs covered x/y · ACs tested x/y · orphans n · dangling n\nBlocking: &lt;bullets from the gate output&gt;\nNext: /adlc-&lt;phase&gt; — &lt;one line on what it will do&gt;\nSuggested skills: &lt;1–3 from that phase&#x27;s &quot;Recommended skills&quot;&gt;<\/code><\/pre><\/li><\/ol>\n<ol start=\"4\"><li>If the gate passed and the user approves, update <code>.adlc/STATUS.md<\/code> (tick the box, date, approver = the user) and advance <code>Current phase<\/code>.<\/li><\/ol>\n<p>Phase → playbook: 1 <code>adlc-setup<\/code> · 2 <code>adlc-spec<\/code> · 3 <code>adlc-design<\/code> · 4 <code>adlc-tdd<\/code> · 5 <code>adlc-build<\/code> · 6 <code>adlc-review<\/code> · 7 <code>adlc-feedback<\/code>. Helpers: <code>adlc-grill<\/code>, <code>adlc-trace<\/code>, <code>adlc-retro<\/code>.<\/p>\n<p>Never tick a gate without running it and getting the user&#x27;s explicit approval.<\/p>",
+   "source": ".adlc/skills/adlc/SKILL.md"
+  },
+  {
+   "name": "adlc-grill",
+   "title": "Grill — structured interview",
+   "kind": "helper",
+   "phase": null,
+   "usedIn": [],
+   "descriptionHtml": "Interview the user relentlessly, one question at a time with a recommended answer, until a requirement, open question or design is unambiguous; write answers back into the ADLC docs. Use in Setup, Spec (OPEN-xxx items) and Design, or whenever the user says &quot;grill me&quot;.",
+   "bodyHtml": "<p><strong>Goal:<\/strong> shared understanding with no hidden assumptions, captured in the docs.<\/p>\n<h4>Rules<\/h4>\n<ol><li><strong>One question per message.<\/strong> Never a list of questions.<\/li><li>Each question comes with <strong>your recommended answer<\/strong> and a one-line reason, so the user can just say &quot;yes&quot;.<\/li><li>Before asking, check whether the repo or docs already answer it — don&#x27;t ask what you can read.<\/li><li>Walk the decision tree depth-first: resolve a branch fully before opening the next.<\/li><li>Prefer concrete scenarios to abstract questions (&quot;An invoice arrives with a negative line — what happens?&quot;).<\/li><li>Push back on vague answers (&quot;fast&quot;, &quot;secure&quot;, &quot;normal&quot;) until they are measurable.<\/li><\/ol>\n<h4>Coverage checklist (pick what applies)<\/h4>\n<p>Actors &amp; permissions · happy path · error and edge cases (empty, duplicate, concurrent, huge, malformed, late) · data ownership &amp; retention · integrations &amp; their failure modes · NFR numbers · regulatory/PII · out of scope · success metrics.<\/p>\n<h4>Write back as you go<\/h4>\n<ul><li>Charter facts → <code>docs/00-setup/PROJECT-CHARTER.md<\/code><\/li><li>Terms → <code>CONTEXT.md<\/code> glossary<\/li><li>Requirement answers → <code>SPEC.md<\/code> (mark the <code>OPEN-xxx<\/code> row Resolved with the answer)<\/li><li>Design decisions → an ADR<\/li><\/ul>\n<p>Stop when the user says so or when the checklist is exhausted; summarise what changed.<\/p>",
+   "source": ".adlc/skills/adlc-grill/SKILL.md"
+  },
+  {
+   "name": "adlc-retro",
+   "title": "Retro",
+   "kind": "helper",
+   "phase": null,
+   "usedIn": [
+    7
+   ],
+   "descriptionHtml": "Run a short, evidence-based retrospective for a slice or iteration — metrics from git, reviews and traceability, what went well or badly, where the AI helped or hurt — and turn actions into routed feedback items. Use at the end of each slice/iteration or when the user asks for a retro.",
+   "bodyHtml": "<ol><li><strong>Gather evidence<\/strong> (don&#x27;t ask the user for what you can compute):<ul><li><code>git log --oneline main<\/code> since the last retro; PRs merged; cycle time from first spec commit to merge.<\/li><li>Review records in <code>docs/05-review/reviews/<\/code> — findings by severity, recurring categories.<\/li><li><code>make trace<\/code> — AC coverage, orphans, failures.<\/li><li><code>docs/06-feedback/FEEDBACK-LOG.md<\/code> — defects found after merge (escaped defects).<\/li><li>Tests modified after the TDD commit (<code>git log -p -- tests/<\/code>) — signs of weakened tests.<\/li><\/ul><\/li><li><strong>Draft<\/strong> <code>docs/06-feedback/retro-&lt;YYYY-MM-DD&gt;.md<\/code> from <code>RETRO-TEMPLATE.md<\/code> with the metrics.<\/li><li><strong>Ask the user<\/strong> (one question at a time): what went well, what was painful, where the AI helped, where it hurt (hallucinated APIs, over-mocking, ignored the architecture, …).<\/li><li><strong>Actions:<\/strong> at most 3, each specific and owned. Each becomes a <code>FB-xxx<\/code> row in the feedback log with a route; Process actions become rules in <code>AGENTS.md<\/code> → &quot;Lessons learned&quot; or edits to <code>.adlc/skills/<\/code> (then <code>make agents-sync<\/code>).<\/li><li>Check last retro&#x27;s actions: done? If not, carry over or drop explicitly.<\/li><\/ol>",
+   "source": ".adlc/skills/adlc-retro/SKILL.md"
+  },
+  {
+   "name": "adlc-trace",
+   "title": "Trace — bidirectional traceability",
+   "kind": "helper",
+   "phase": null,
+   "usedIn": [
+    4
+   ],
+   "descriptionHtml": "Generate and explain the bidirectional traceability matrix (requirement → AC → component → test → result, and test → requirement), then fix each gap. Use when a gate reports uncovered ACs, orphan tests or dangling ids, before review, or when asked &quot;what tests cover X&quot; / &quot;what does this test verify&quot;.",
+   "bodyHtml": "<ol><li>Run <code>make trace<\/code>. It writes <code>docs/03-tests/TRACEABILITY.md<\/code> and prints the summary and gaps.<\/li><li>Answer the user&#x27;s question from the matrix:<ul><li><em>Forward<\/em> — &quot;What verifies FR-002?&quot; → its ACs, components, test file:line, pass/fail.<\/li><li><em>Backward<\/em> — &quot;Why does <code>tests/test_x.py<\/code> exist?&quot; → ids it references → FRs → components.<\/li><\/ul><\/li><li>Fix gaps — propose each fix, apply after the user agrees:<\/li><\/ol>\n<div class=\"table-wrap\"><table><thead><tr><th>Gap<\/th><th>Meaning<\/th><th>Fix<\/th><\/tr><\/thead><tbody><tr><td>AC without tests<\/td><td>Forward gap — requirement unverified<\/td><td>Write the test (<code>/adlc-tdd<\/code>) or, if the AC is obsolete, deprecate it in SPEC with <code>~~<\/code><\/td><\/tr><tr><td>Orphan test file<\/td><td>Backward gap — test verifies no known requirement<\/td><td>Add the AC id it verifies; if it reveals an unspecified behaviour, add an AC to SPEC (with user approval); if it&#x27;s a helper, add <code>adlc: no-trace<\/code><\/td><\/tr><tr><td>Dangling id<\/td><td>Test cites an id not in SPEC (typo or removed requirement)<\/td><td>Correct the id, or delete/repurpose the test<\/td><\/tr><tr><td>Deprecated reference<\/td><td>Test verifies a requirement that was withdrawn<\/td><td>Delete the test or move it to the replacing AC<\/td><\/tr><tr><td>Failing AC<\/td><td>Test exists but is red in the JUnit report<\/td><td>Back to <code>/adlc-build<\/code> (or <code>/adlc-tdd<\/code> if the test is wrong vs spec)<\/td><\/tr><tr><td>FR not mapped to a component<\/td><td>Design gap<\/td><td>Update the component table (<code>/adlc-design<\/code>)<\/td><\/tr><tr><td>No result column<\/td><td>JUnit XML not found<\/td><td>Configure the test runner to write <code>reports/*.xml<\/code>, or set <code>ADLC_JUNIT<\/code><\/td><\/tr><\/tbody><\/table><\/div>\n<ol start=\"4\"><li>Re-run <code>make trace<\/code> until the Gaps section says &quot;None&quot;.<\/li><\/ol>\n<p><strong>Id conventions:<\/strong> <code>FR-001<\/code>, <code>NFR-001<\/code>, <code>AC-001<\/code> (3+ digits; <code>AC_001<\/code> also accepted in code). Put AC ids in <strong>test names<\/strong> so they also show up in JUnit results.<\/p>",
+   "source": ".adlc/skills/adlc-trace/SKILL.md"
+  }
+ ],
+ "roles": [
+  {
+   "name": "code-reviewer",
+   "kind": "role",
+   "tools": [
+    "Read",
+    "Grep",
+    "Glob",
+    "Bash"
+   ],
+   "usedIn": [
+    6
+   ],
+   "descriptionHtml": "Independent ADLC Phase 6 reviewer — checks a branch diff against SPEC acceptance criteria, ARCHITECTURE/ADRs, bidirectional traceability and docs/05-review/REVIEW-CHECKLIST.md. Use before marking a slice&#x27;s review approved.",
+   "bodyHtml": "<p>You are an independent senior reviewer who did not write this code. Do not edit files.<\/p>\n<ol><li>Get the diff: <code>git diff main...HEAD<\/code> and <code>git log main..HEAD --oneline<\/code>.<\/li><li>Identify the slice&#x27;s ACs from commit messages and <code>.adlc/STATUS.md<\/code>; read them in SPEC.md.<\/li><li>Read ARCHITECTURE.md, the ADRs, CONTEXT.md, REVIEW-CHECKLIST.md and the applicable coding standards in <code>docs/standards/<\/code> (GENERAL + FRONTEND/BACKEND + the stack standard).<\/li><li>Run <code>make trace<\/code> and check the slice in <code>docs/03-tests/TRACEABILITY.md<\/code>:<ul><li><strong>Forward:<\/strong> each slice AC → passing test.<\/li><li><strong>Backward:<\/strong> each changed source file is exercised by a test that traces to an AC; behaviour in the diff that no AC asks for is a finding (unrequested scope or a missing AC).<\/li><\/ul><\/li><li>Review every checklist section, in particular:<ul><li><strong>Spec:<\/strong> behaviour beyond or short of the ACs; unhandled error paths.<\/li><li><strong>Design:<\/strong> component boundary violations; undocumented decisions needing an ADR; terms that differ from CONTEXT.md.<\/li><li><strong>Correctness:<\/strong> for each claimed bug give a concrete failing input.<\/li><li><strong>Tests:<\/strong> weakened or changed to pass? (<code>git diff main...HEAD -- tests/<\/code>)<\/li><li><strong>Standards:<\/strong> violations of MUST rules not caught by tooling; cite the rule id (<code>NET-31<\/code>, <code>RE-21<\/code>, <code>PY-40<\/code>, <code>BE-13<\/code> …). MUST → High (Medium if trivial), SHOULD → Low/Medium.<\/li><\/ul><\/li><li>Report only findings you can justify with a concrete scenario. No style nits unless they harm readability.<\/li><\/ol>\n<p>Output a table: <code># | Severity (Critical/High/Medium/Low) | File:line | Finding | Rule / AC id | Concrete failure scenario | Suggested fix<\/code>. End with <code>Recommended verdict: APPROVED | CHANGES-REQUESTED<\/code>.<\/p>",
+   "source": ".adlc/roles/code-reviewer.md"
+  },
+  {
+   "name": "spec-critic",
+   "kind": "role",
+   "tools": [
+    "Read",
+    "Grep",
+    "Glob"
+   ],
+   "usedIn": [
+    2
+   ],
+   "descriptionHtml": "Critiques docs/01-spec/SPEC.md for ambiguity, untestable acceptance criteria, gaps, contradictions and broken id structure. Use in ADLC Phase 2 before asking for spec approval.",
+   "bodyHtml": "<p>You are a skeptical requirements analyst working in an independent context. Read <code>docs/01-spec/SPEC.md<\/code>, <code>CONTEXT.md<\/code> and <code>docs/00-setup/PROJECT-CHARTER.md<\/code>. Do not edit files.<\/p>\n<p>Check:<\/p>\n<ol><li><strong>Testability<\/strong> — can each AC become one automated test with a clear pass/fail? Flag vague words (&quot;fast&quot;, &quot;user-friendly&quot;, &quot;handle&quot;, &quot;appropriate&quot;, &quot;etc.&quot;).<\/li><li><strong>Completeness<\/strong> — each FR has a happy path and at least one error/edge AC; boundary values, empty/duplicate/concurrent inputs, permissions, time zones, currency/rounding where relevant.<\/li><li><strong>Traceability structure<\/strong> — every AC sits under an <code>### FR-xxx<\/code> heading; ids unique; no renumbering of existing ids; each charter goal maps to ≥1 FR (forward) and each FR to a charter goal or stakeholder need (backward).<\/li><li><strong>Consistency<\/strong> — contradictions between FRs, NFRs, charter scope and glossary.<\/li><li><strong>Scope<\/strong> — anything the charter puts out of scope.<\/li><li><strong>NFRs<\/strong> — each quantified with a stated verification method.<\/li><li><strong>Glossary<\/strong> — terms used but undefined in CONTEXT.md, or synonyms used inconsistently.<\/li><\/ol>\n<p>Output a table: <code># | Severity (High/Med/Low) | Location (FR/AC id) | Problem | Suggested fix or question<\/code>. End with the 3 most important questions to ask the business owner.<\/p>",
+   "source": ".adlc/roles/spec-critic.md"
+  },
+  {
+   "name": "test-auditor",
+   "kind": "role",
+   "tools": [
+    "Read",
+    "Grep",
+    "Glob",
+    "Bash"
+   ],
+   "usedIn": [
+    4
+   ],
+   "descriptionHtml": "Audits tests written in ADLC Phase 4 for bidirectional AC traceability and test quality (weak assertions, over-mocking, testing implementation details). Use after writing failing tests and before implementation.",
+   "bodyHtml": "<p>You audit tests against the specification in an independent context. Do not edit files.<\/p>\n<ol><li>Run <code>make trace<\/code> and read <code>docs/03-tests/TRACEABILITY.md<\/code>.<ul><li><strong>Forward:<\/strong> every AC in scope has a test. List missing ones.<\/li><li><strong>Backward:<\/strong> every test references a real, non-deprecated AC; the test actually verifies <em>that<\/em> AC (an id in the name of a test that checks something else is worse than no id).<\/li><\/ul><\/li><li>For each test, compare against its AC&#x27;s Given/When/Then in <code>docs/01-spec/SPEC.md<\/code>:<ul><li>Sets up the <em>Given<\/em>, performs exactly the <em>When<\/em>, asserts the <em>Then<\/em> with the AC&#x27;s concrete values?<\/li><li>Would it fail if the behaviour broke? Flag tautological asserts, asserting only on mocks, snapshot-only tests, missing assertions.<\/li><li>Tests through the public interface in <code>docs/02-design/ARCHITECTURE.md<\/code>, not internals?<\/li><li>Mocks only at system boundaries (network, clock, external services)?<\/li><li>Deterministic (no sleeps, real time, unseeded randomness, order dependence)?<\/li><li>AC id in the test <strong>name<\/strong> (so it appears in JUnit results), not only a comment?<\/li><\/ul><\/li><li>Run <code>make test<\/code> and confirm new tests fail with assertion/not-implemented errors, not import/syntax/fixture errors.<\/li><\/ol>\n<p>Output a table: <code>Test | AC | Problem | Fix<\/code>. Then <code>Forward coverage: n/m ACs<\/code>, <code>Backward: k tests mis-traced<\/code>, <code>Red for right reason: yes/no<\/code>.<\/p>",
+   "source": ".adlc/roles/test-auditor.md"
+  }
+ ]
+}</script>
+<script>
+(function () {
+  "use strict";
+
+  var DATA = JSON.parse(document.getElementById("adlc-data").textContent);
+  var FIRST_SLICE_PHASE = 4; // phases 4–7 run per slice (.adlc/STATUS.md); 1–3 once per project
+  var THEME_KEY = "adlc-guide-theme";
+
+  var phases = DATA.phases;
+  var entries = DATA.skills.concat(DATA.roles);
+  var byName = {};
+  entries.forEach(function (entry) { byName[entry.name] = entry; });
+
+  function el(tag, attrs, children) {
+    var node = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (key) {
+      if (attrs[key] === null || attrs[key] === undefined) return;
+      if (key === "html") node.innerHTML = attrs[key];
+      else if (key === "text") node.textContent = attrs[key];
+      else if (key.slice(0, 2) === "on") node.addEventListener(key.slice(2), attrs[key]);
+      else node.setAttribute(key, attrs[key]);
+    });
+    (children || []).forEach(function (child) { if (child) node.appendChild(child); });
+    return node;
+  }
+
+  function phaseLabel(number) {
+    var phase = phases.filter(function (p) { return p.number === number; })[0];
+    return phase ? number + ". " + phase.name : "Phase " + number;
+  }
+
+  /* ---------- theme ---------- */
+  var root = document.documentElement;
+  function readTheme() { try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; } }
+  function saveTheme(value) { try { localStorage.setItem(THEME_KEY, value); } catch (e) { /* storage unavailable */ } }
+  var stored = readTheme();
+  if (stored === "light" || stored === "dark") root.setAttribute("data-theme", stored);
+  document.getElementById("theme-toggle").addEventListener("click", function () {
+    var current = root.getAttribute("data-theme") ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    var next = current === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    saveTheme(next);
+  });
+
+  /* ---------- static content ---------- */
+  document.getElementById("intro").innerHTML = DATA.introHtml;
+  document.getElementById("traceability-body").innerHTML = DATA.traceabilityHtml;
+  document.getElementById("principles-body").innerHTML = DATA.principlesHtml;
+  document.getElementById("iterating-body").innerHTML = DATA.iteratingHtml;
+
+  var loops = document.getElementById("loops");
+  DATA.flowEdges.forEach(function (edge) {
+    loops.appendChild(el("span", { "class": "loop" }, [
+      el("b", { text: edge.from }), document.createTextNode(" → "), el("b", { text: edge.to }),
+      document.createTextNode(" · " + edge.label)
+    ]));
+  });
+
+  /* ---------- lifecycle ---------- */
+  var chips = [];
+  var selected = phases[0].number;
+
+  phases.forEach(function (phase) {
+    var chip = el("button", {
+      "class": "phase-chip", type: "button", "aria-pressed": "false",
+      "aria-label": "Phase " + phase.number + ": " + phase.name,
+      onclick: function () { selectPhase(phase.number, true); }
+    }, [el("span", { "class": "num", text: String(phase.number) }), el("span", { "class": "label", text: phase.name })]);
+    chip.dataset.phase = phase.number;
+    chips.push(chip);
+    document.getElementById(phase.number < FIRST_SLICE_PHASE ? "flow-project" : "flow-slice").appendChild(chip);
+  });
+
+  document.querySelector(".flow").addEventListener("keydown", function (event) {
+    if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+    var index = phases.findIndex(function (p) { return p.number === selected; });
+    var next = phases[index + (event.key === "ArrowRight" ? 1 : -1)];
+    if (next) { event.preventDefault(); selectPhase(next.number, true); chips[phases.indexOf(next)].focus(); }
+  });
+
+  function commandButton(name) {
+    var entry = byName[name];
+    var kind = entry ? entry.kind : "phase";
+    var label = kind === "role" ? name + " role" : "/" + name;
+    return el("button", {
+      "class": "cmd" + (kind === "phase" ? "" : " " + kind), type: "button", text: label,
+      title: entry ? "Show " + name + " in Skills & roles" : "",
+      onclick: function () { showEntry(name); }
+    });
+  }
+
+  function card(title, html, extraClass, extra) {
+    return el("div", { "class": "card" + (extraClass ? " " + extraClass : "") },
+      [el("h4", { text: title }), el("p", { html: html })].concat(extra || []));
+  }
+
+  function selectPhase(number, updateHash) {
+    var index = Math.max(0, phases.findIndex(function (p) { return p.number === number; }));
+    number = phases[index].number;
+    selected = number;
+    var phase = phases[index];
+    chips.forEach(function (chip) { chip.setAttribute("aria-pressed", String(Number(chip.dataset.phase) === number)); });
+
+    var playbook = byName[phase.playbooks[0]];
+    var commands = el("div", { "class": "commands" },
+      phase.playbooks.concat(phase.roles).map(commandButton));
+    var gateCommand = el("pre", {}, [el("code", { text: "make gate-" + phase.gate })]);
+
+    var detail = document.getElementById("phase-detail");
+    detail.replaceChildren(
+      el("div", { "class": "detail-head" }, [
+        el("div", { "class": "big-num", text: String(phase.number), "aria-hidden": "true" }),
+        el("div", {}, [
+          el("p", { "class": "eyebrow", text: "Phase " + phase.number + " · " +
+            (phase.number < FIRST_SLICE_PHASE ? "once per project" : "per slice") }),
+          el("h3", { text: phase.name }),
+          el("p", { "class": "goal", html: phase.goalHtml })
+        ])
+      ]),
+      el("div", { "class": "detail-grid" }, [
+        card("Inputs", phase.inputsHtml),
+        card("Outputs", phase.outputsHtml),
+        card("Exit gate", phase.gateHtml, "gate", [gateCommand]),
+        el("div", { "class": "card" }, [el("h4", { text: "Playbook & roles" }), commands]),
+        card("Recommended skills", phase.skillsHtml)
+      ]),
+      playbook ? el("details", { "class": "steps" }, [
+        el("summary", { text: "Playbook steps — " + playbook.title }),
+        el("div", { "class": "md", html: playbook.bodyHtml })
+      ]) : null,
+      el("div", { "class": "pager" }, [
+        el("button", { type: "button", text: "← " + (phases[index - 1] ? phaseLabel(phases[index - 1].number) : "Previous"),
+          disabled: index === 0 ? "" : null, onclick: function () { selectPhase(phases[index - 1].number, true); } }),
+        el("button", { type: "button", text: (phases[index + 1] ? phaseLabel(phases[index + 1].number) : "Next") + " →",
+          disabled: index === phases.length - 1 ? "" : null, onclick: function () { selectPhase(phases[index + 1].number, true); } })
+      ])
+    );
+    if (updateHash) history.replaceState(null, "", "#phase-" + number);
+  }
+
+  /* ---------- skills & roles ---------- */
+  var FILTERS = [
+    { id: "all", label: "All", test: function () { return true; } },
+    { id: "phase", label: "Phase playbooks", test: function (e) { return e.kind === "phase"; } },
+    { id: "helper", label: "Helpers", test: function (e) { return e.kind === "helper"; } },
+    { id: "role", label: "Reviewer roles", test: function (e) { return e.kind === "role"; } }
+  ];
+  var activeFilter = "all";
+  var query = "";
+  var cards = {};
+
+  var filterBar = document.getElementById("filters");
+  FILTERS.forEach(function (filter) {
+    var count = entries.filter(filter.test).length;
+    filterBar.appendChild(el("button", {
+      "class": "filter", type: "button", "aria-pressed": String(filter.id === activeFilter), "data-filter": filter.id,
+      onclick: function () { activeFilter = filter.id; applyFilters(); }
+    }, [document.createTextNode(filter.label), el("span", { "class": "count", text: String(count) })]));
+  });
+
+  function badgeText(entry) {
+    if (entry.kind === "phase") return "Phase " + entry.phase;
+    return entry.kind === "role" ? "Role" : "Helper";
+  }
+
+  function usedInLinks(entry) {
+    var numbers = entry.usedIn.filter(function (n) { return n !== entry.phase; });
+    if (!numbers.length) return null;
+    var span = el("span", { text: entry.kind === "role" ? "Runs in " : "Used in " });
+    numbers.forEach(function (number, i) {
+      if (i) span.appendChild(document.createTextNode(", "));
+      span.appendChild(el("button", { type: "button", text: phaseLabel(number), onclick: function () { goToPhase(number); } }));
+    });
+    return span;
+  }
+
+  var grid = document.getElementById("skill-grid");
+  entries.forEach(function (entry) {
+    var meta = el("div", { "class": "meta" }, [
+      entry.kind === "role" ? null : el("span", {}, [el("code", { text: "/" + entry.name })]),
+      entry.tools && entry.tools.length ? el("span", { text: "Tools: " + entry.tools.join(", ") }) : null,
+      usedInLinks(entry),
+      entry.kind === "phase" ? el("span", {}, [el("button", { type: "button", text: "Open phase",
+        onclick: function () { goToPhase(entry.phase); } })]) : null
+    ]);
+    var node = el("article", { "class": "skill", id: "skill-" + entry.name }, [
+      el("div", { "class": "skill-body" }, [
+        el("div", { "class": "skill-top" }, [
+          el("span", { "class": "skill-name", text: entry.name }),
+          el("span", { "class": "badge " + entry.kind, text: badgeText(entry) })
+        ]),
+        entry.title && entry.title !== entry.name ? el("p", { "class": "skill-title", text: entry.title }) : null,
+        el("p", { "class": "skill-desc", html: entry.descriptionHtml }),
+        meta
+      ]),
+      el("details", { "class": "more" }, [
+        el("summary", { text: entry.kind === "role" ? "Read role instructions" : "Read playbook" }),
+        el("div", { "class": "md", html: entry.bodyHtml }),
+        el("div", { "class": "source" }, [el("code", { text: entry.source })])
+      ])
+    ]);
+    node.dataset.search = (entry.name + " " + node.textContent).toLowerCase();
+    cards[entry.name] = node;
+    grid.appendChild(node);
+  });
+  var empty = el("div", { "class": "empty", text: "No skills or roles match your search." });
+  grid.after(empty);
+
+  function applyFilters() {
+    var filter = FILTERS.filter(function (f) { return f.id === activeFilter; })[0];
+    var visible = 0;
+    entries.forEach(function (entry) {
+      var show = filter.test(entry) && (!query || cards[entry.name].dataset.search.indexOf(query) !== -1);
+      cards[entry.name].hidden = !show;
+      if (show) visible++;
+    });
+    empty.hidden = visible > 0;
+    filterBar.querySelectorAll(".filter").forEach(function (button) {
+      button.setAttribute("aria-pressed", String(button.dataset.filter === activeFilter));
+    });
+  }
+
+  document.getElementById("search").addEventListener("input", function (event) {
+    query = event.target.value.trim().toLowerCase();
+    applyFilters();
+  });
+
+  function showEntry(name) {
+    var node = cards[name];
+    if (!node) return;
+    activeFilter = "all"; query = "";
+    document.getElementById("search").value = "";
+    applyFilters();
+    node.querySelector("details").open = true;
+    node.scrollIntoView({ block: "start" });
+    node.classList.add("flash");
+    setTimeout(function () { node.classList.remove("flash"); }, 1400);
+    history.replaceState(null, "", "#skill-" + name);
+  }
+
+  function goToPhase(number) {
+    selectPhase(number, true);
+    document.getElementById("lifecycle").scrollIntoView({ block: "start" });
+  }
+
+  /* ---------- nav highlight ---------- */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll("nav.tabs a"));
+  if ("IntersectionObserver" in window) {
+    var observer = new IntersectionObserver(function (items) {
+      items.forEach(function (item) {
+        if (!item.isIntersecting) return;
+        navLinks.forEach(function (link) {
+          link.classList.toggle("active", link.getAttribute("href") === "#" + item.target.id);
+        });
+      });
+    }, { rootMargin: "-40% 0px -55% 0px" });
+    document.querySelectorAll("main > section").forEach(function (s) { observer.observe(s); });
+  }
+
+  /* ---------- initial state from the URL ---------- */
+  applyFilters();
+  var hash = location.hash.slice(1);
+  var phaseMatch = /^phase-(\d+)$/.exec(hash);
+  selectPhase(phaseMatch ? Number(phaseMatch[1]) : selected, false);
+  if (phaseMatch) document.getElementById("lifecycle").scrollIntoView();
+  if (hash.indexOf("skill-") === 0) showEntry(hash.slice(6));
+})();
+</script>
+</body>
+</html>
